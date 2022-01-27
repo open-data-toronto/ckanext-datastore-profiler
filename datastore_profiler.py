@@ -8,7 +8,7 @@ def check_assert(bool, out):
     if not bool:
         print(out)
 
-# init environments to choose from for migration
+# PROD Open Data Portal API endpoint base url
 url = "https://ckanadmin0.intra.prod-toronto.ca/"
 
 # init output
