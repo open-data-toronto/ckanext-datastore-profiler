@@ -12,6 +12,31 @@ Eventually, it will
 - Reach out to opendata@toronto.ca
 - Reach out on the Civic Tech Toronto Slack
 
+## Descriptive Statitics for Integers and Floats:
+- mean
+- min
+- max
+- median
+- count of distinct values
+
+## Descriptive Statitics for Dates and Datetimes:
+- earliest date
+- latest date
+- earliest time
+- latest time
+- count of distinct values for date
+- count of distinct values for date month
+- count of distinct values for date year
+- count of distinct values for time
+
+## Descriptive Statitics for Strings:
+- count of distinct values
+- count of distinct "words" (string separated by spaces, ignoring things like "this", "that", "a" etc
+- min and max string length
+- min and max word count per string
+- count of distinct "masks" (where every letter of a string is turned into an "L" and every digit turned into a "D")
+
+
 ## Version Control & Best Coding Practices
 - Steps to be followed to download updated code/documentation before start of any new development
 ```
