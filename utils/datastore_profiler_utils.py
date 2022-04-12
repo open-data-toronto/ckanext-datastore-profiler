@@ -66,12 +66,21 @@ def numeric_count(input):
     # remove nulls from working data
     working_data = [number for number in input if number]
 
+    # calculate distinct counts that each number appears
+    number_counts = {}
+    for number in working_data:
+        if str(number) in number_counts.keys():
+            number_counts[str(number)] += 1
+        else:
+            number_counts[str(number)] = 1
+
     return {
         "min": min(working_data),
         "max": max(working_data),
         "median": statistics.median(working_data),
         "mean": statistics.mean(working_data),
-        "null_count": len([item for item in input if item == None])
+        "null_count": len([item for item in input if item == None]),
+        "number_counts": number_counts
     }
 
 
@@ -147,7 +156,7 @@ def word_count(input):
 
 if __name__ == "__main__":
     string_data = ["val2", "val3", "val4", "ccc-9", "d-1", "val-3", "val-3", "val1 val2 val3", "this is val1", "this is val2", None, None]
-    num_data = [1,2,3,4,5,5.5, -5, 1213, 12.1231231231, 9, None]
+    num_data = [1,2,3,4,5,5.5, 5,5,5, -5, 1213, 12.1231231231, 9, None]
     bool_data = [True, False, True, True, False, None, True]
     date_data = [datetime(2020,5,16), datetime.now(), None, datetime(1991, 6,14), None, None]
 
