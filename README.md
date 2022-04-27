@@ -72,3 +72,28 @@ git push origin branch_name
 - E.g: Developer/Reviewers:
   - E.x-1: Mac develops code related to Statistics of Strings ---> Reviewer: Hareesh or Denis
   - E.x-2: Hareesh develops code related to Statistics of Date/Datetimes ---> Reviewer: Mackenzie or Denis
+
+## Using virtualenv and requirements.txt
+To run this module locally, consider using `virtualenv`. To get started with `virtualenv`:
+
+```sh
+pip install virtualenv
+cd path/to/profiler-open-data-toronto
+virtualenv venv
+```
+
+This creates a `venv` folder, which you dont need to edit. This folder contains a portable python environment, where you can manage what `pip` installs separate from other environments on your machine or on other virtual environments.
+
+To activate your virtual environment:
+```sh
+# on windows
+.\venv\Scripts\activate.bat
+
+# on *nix 
+source venv/bin/activate
+
+# to install the required modules
+pip install -r requirements.txt
+```
+
+With the virtual environment active, any python scripts you run will have access to the needed modules in the correct versions
