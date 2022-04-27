@@ -38,31 +38,16 @@ Eventually, it will
 
 ## Details about Test Driven Development (TDD)
 - Test Driven Development is a great way to develop software. Especially when we have multiple combinations of datasets to test on. 
-- I wrapped `datastore_profiler_utils.py/numeric_counts()` function as a method in `DataStatistics` class in `utils_profiler.py` file.
-- I further, created a `test_utils_profiler.py` file that has collection of unittest to validate the profiler that we are building.  
-- Here are the snippets on how to run the unittests from `utils` folder
-```sh
-python -m unittest -v 
-```
-- Output of the unittest will look like below
-```sh
-test_counts_of_values_in_list (test_utils_profiler.NumericStatisticsTestCase)
-Testcase to check count of values in the list ... ok
-test_max_value_from_list (test_utils_profiler.NumericStatisticsTestCase)
-Testcase to check computation of max value from a list ... ok
-test_mean_value_from_list (test_utils_profiler.NumericStatisticsTestCase)
-Testcase to check computation of mean value from a list ... ok
-test_median_value_from_list (test_utils_profiler.NumericStatisticsTestCase)       
-Testcase to check computation of median value from a list ... ok
-test_min_value_from_list (test_utils_profiler.NumericStatisticsTestCase)
-Testcase to check computation of min value from a list ... ok
-test_number_of_null_values_in_list (test_utils_profiler.NumericStatisticsTestCase)
-Testcase to check no. of Null Values in the list ... ok
+- Any `.py` file in the project that has `test` at the beginning or end of its filename will have any functions in it starting or ending with `test` will be run when `pytest` is run from `profiler-open-data-toronto` folder
 
-----------------------------------------------------------------------
-Ran 6 tests in 0.004s
+- Output of successful tests will look like below
+```sh
+collected 10 items
 
-OK
+utils\test_numericstatistics.py .....   [ 60%]
+utils\test_stringstatistics.py ....     [100%]        
+
+============ 10 passed in 1.09s ==============
 ```
 - My idea is that we write unittests not just at a data source level, but to validate our profiler when using multiple data sources. 
 
