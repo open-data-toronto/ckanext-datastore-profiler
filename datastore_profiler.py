@@ -2,7 +2,7 @@
 
 import requests
 import json
-import datastore_profiler_utils
+import utils.datastore_profiler_utils as datastore_profiler_utils
 
 def check_assert(bool, out):
     if not bool:

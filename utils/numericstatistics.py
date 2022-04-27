@@ -1,3 +1,5 @@
+# numericstatistics.py - class for summarizing lists of numeric data
+
 # Import python libraries
 from dataclasses import dataclass
 import numpy as np
@@ -5,7 +7,7 @@ import pandas as pd
 
 
 @dataclass
-class DataStatistics:
+class NumericStatistics:
     '''
         This class is a Collection of methods that compute statistics (based on input datatype) as required by OpenData 
     '''

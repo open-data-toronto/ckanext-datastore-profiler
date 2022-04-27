@@ -162,8 +162,8 @@ if __name__ == "__main__":
 
     print(unique_count(string_data))
     print(mask_count(string_data))
-    print(numeric_count(num_data))
-    print(boolean_count(bool_data))
-    print(timestamp_count(date_data))
+    #print(numeric_count(num_data))
+    #print(boolean_count(bool_data))
+    #print(timestamp_count(date_data))
     print(word_count(string_data))
             
