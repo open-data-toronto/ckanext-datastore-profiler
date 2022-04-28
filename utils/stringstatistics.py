@@ -101,11 +101,11 @@ class StringStatistics:
         if None in input:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
 
-        #return output sorted by count
+        # return output sorted by count
         return {
-            "word_counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
-            "min_word_count": min( [len(words.split(" ")) for words in working_data] ),
-            "max_word_count": max( [len(words.split(" ")) for words in working_data] ),
-            "min_string_length": min( [len(words) for words in working_data] ),
-            "max_string_length": max( [len(words) for words in working_data] )
+                "word_counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
+                "min_word_count": min( [len(words.split(" ")) for words in working_data] ),
+                "max_word_count": max( [len(words.split(" ")) for words in working_data] ),
+                "min_string_length": min( [len(words) for words in working_data] ),
+                "max_string_length": max( [len(words) for words in working_data] )
             }
