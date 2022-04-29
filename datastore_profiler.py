@@ -1,6 +1,5 @@
 # datastore_profiler.py - for input package name's datastore resources, add profile object to each datastore field metadata
 
-from unicodedata import numeric
 import requests
 import json
 from utils import numericstatistics, datestatistics, stringstatistics
@@ -8,23 +7,17 @@ import pandas
 
 
 class Profiler:
-    def __init__(self, package_name, env="dev"):
+    def __init__(self, package_name, ckanaddress, apikey ):
 
-        
-        # Open Data Portal API endpoint base urls
-        ckan_urls = {
-            "dev": "https://ckanadmin0.intra.dev-toronto.ca/",
-            "qa": "https://ckanadmin0.intra.qa-toronto.ca/",
-            "prod": "https://ckanadmin0.intra.prod-toronto.ca/",
-        }
-        assert env in ckan_urls.keys(), "input env is not a valid environment - choose from " + str(list(ckan_urls))
-        self.url = ckan_urls[env]
+        # init CKAN credentials
+        self.url = ckanaddress
+        self.apikey = apikey
 
-        # init requests sessions avoiding the use of a proxy
+        # init requests sessions to help avoid proxy errors
         self.session = requests.Session()
         self.session.trust_env = False
 
-        # init package name var
+        # validate and init package name var
         assert package_name in json.loads( self.session.get( self.url + "api/action/package_list").text)["result"], "Input package name is not in " + self.url
         self.package_name = package_name
 
@@ -72,14 +65,13 @@ class Profiler:
                 fieldname = fields_metadata[i]["id"]
                 if fieldname == "_id":
                     fields_metadata.pop(i)
-                    print("removing _id")
                     break
             
             # write edited resource metadata into ckan
-            headers = {"Authorization": ""}
+            headers = {"Authorization": self.apikey}
             result = json.loads( self.session.post( self.url + "api/action/datastore_create", json={"resource_id": resource_id, "fields": fields_metadata, "force":True}, headers=headers ).text)
             assert result["success"], "Failed to update profiles for " + resource_id
             
 
 if __name__ == "__main__":
-    Profiler("bodysafe").profile_datastore_resource()
+    Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).profile_datastore_resource()
