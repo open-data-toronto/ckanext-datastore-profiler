@@ -36,7 +36,10 @@ class Profiler:
 
         return output
 
-    def profile_datastore_resource(self):
+    def profile_datastore_resources_dump(self):
+        """ 
+            Loads all the OpenData data sources as a single dump file and runs the profiler on every data sources
+        """
         all_fields_metadata = self.get_datastore_resource_fields_metadata()
         for resource_id in all_fields_metadata.keys():
             # for each resource
@@ -74,4 +77,4 @@ class Profiler:
             
 
 if __name__ == "__main__":
-    Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).profile_datastore_resource()
+    Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).profile_datastore_resources_dump()
