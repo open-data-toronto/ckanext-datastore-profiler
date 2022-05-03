@@ -9,3 +9,4 @@ six==1.16.0
 statistics==1.0.3.5
 zope.interface==5.4.0
 diagrams==0.21.1
+pandas-bokeh==0.5.5
