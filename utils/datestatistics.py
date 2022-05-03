@@ -36,7 +36,7 @@ class DateStatistics:
             "%d%b%Y": "%Y-%m-%d",
         }
 
-        for value in [val for val in input if val]: # this list comp remove Null values from this
+        for value in [str(val) for val in input if val]: # this list comp remove Null values from this
             # clean each value
             value = value.replace("/", "-")
             for format in format_dict.keys():

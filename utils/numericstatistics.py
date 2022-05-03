@@ -2,8 +2,8 @@
 
 # Import python libraries
 from dataclasses import dataclass
-import numpy as np
-import pandas as pd
+
+import statistics
 
 
 @dataclass
@@ -12,7 +12,7 @@ class NumericStatistics:
         This class is a Collection of methods that compute statistics (based on input datatype) as required by OpenData 
     '''
 
-    def numeric_count(input):
+    def numeric_count(self, input):
         """
             Method to compute selected statistics on numerical data
     
@@ -24,11 +24,11 @@ class NumericStatistics:
                             - outputs numeric stats on non-null values (and count of nulls)
         """
 
-        # make sure all inputs can be converted to integer
-        assert all(isinstance(int(x), int) for x in input if x), "Input to min_max_med() must be all int, float or null"
+        # make sure all inputs can be converted to float
+        assert all(isinstance(float(x), float) for x in input if x), "Input to min_max_med() must be all int, float or null"
         
         # remove nulls from working data
-        working_data = [number for number in input if number]
+        working_data = [float(number) for number in input if number]
 
         # calculate distinct counts that each number appears
         number_counts = {}
@@ -39,11 +39,11 @@ class NumericStatistics:
                 number_counts[str(number)] = 1
 
         return {
-            "min": np.min(working_data),
-            "max": np.max(working_data),
-            "median": np.median(working_data),
-            "mean": np.mean(working_data),
+            "min": min(working_data),
+            "max": max(working_data),
+            "median": statistics.median(working_data),
+            "mean": statistics.mean(working_data),
             "null_count": len([item for item in input if item == None]),
-            "number_counts": number_counts
+            #"number_counts": number_counts
         }
 
