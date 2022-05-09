@@ -26,6 +26,14 @@ class StringStatistics:
         # count how many times each string appears in input
         for unique_value in unique_values:
             output[unique_value] = len( [item for item in input if item == unique_value] )
+
+        # if all strings are unique, label the data as such
+        if all( [value == 1 for value in output.values()] ):
+            output = {"all_unique": True}
+
+        # if all strings are numeric, label the data as such
+        if all( [re.match(r'-?\d+\.?\d?', str(key)) for key in output.keys()] ):
+            output["all_numeric"] = True
         
         # add number of empty values to output
         if None in input:

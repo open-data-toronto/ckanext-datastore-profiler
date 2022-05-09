@@ -40,7 +40,7 @@ class NumericStatistics:
         
         # if all numbers are unique, label the data as such
         all_unique = False
-        if any( [value > 1 for value in number_counts.values()] ):
+        if any( [value == 1 for value in number_counts.values()] ):
             all_unique = True
 
         return {
