@@ -1,10 +1,14 @@
 # datastore_profiler.py - for input package name's datastore resources, add profile object to each datastore field metadata
-
+from fileinput import filename
+from pydoc import source_synopsis
 import requests
 import json
-from utils import numericstatistics, datestatistics, stringstatistics
-import pandas
+import pandas as pd
 
+from utils.numericstatistics import NumericStatistics
+from utils.datestatistics import DateStatistics
+from utils.stringstatistics import StringStatistics
+from utils.utils_plotting import plot_pie_chart, plot_data_table
 
 class Profiler:
     def __init__(self, package_name, ckanaddress, apikey ):
@@ -36,14 +40,17 @@ class Profiler:
 
         return output
 
-    def profile_datastore_resource(self):
+    def profile_datastore_resources_dump(self):
+        """ 
+            Loads all the OpenData data resources as a single dump file and runs the profiler on every data sources
+        """
         all_fields_metadata = self.get_datastore_resource_fields_metadata()
         for resource_id in all_fields_metadata.keys():
             # for each resource
             fields_metadata = all_fields_metadata[resource_id]
             
             # dump data into pandas dataframe
-            df = pandas.read_csv( self.url + "datastore/dump/" + resource_id + "?format=csv", na_filter=False )
+            df = pd.read_csv( self.url + "datastore/dump/" + resource_id + "?format=csv", na_filter=False )
             
             # for each field, add appropriate profile to the metadata aobject
             for i in range(len(fields_metadata)):
@@ -72,6 +79,72 @@ class Profiler:
             result = json.loads( self.session.post( self.url + "api/action/datastore_create", json={"resource_id": resource_id, "fields": fields_metadata, "force":True}, headers=headers ).text)
             assert result["success"], "Failed to update profiles for " + resource_id
             
+    def visualize_datastore_resource(self, resource_id):
+        """ 
+            Run profiler on a data resource with resource_id
+        """
+        # dump data into pandas dataframe
+        fields_json = pd.read_json( self.url + "api/action/datastore_search?id=" + resource_id + "&limit=0")['result']['fields']
+        
+        # Flatten data
+        df = pd.json_normalize(fields_json, max_level=1)
+
+        # Initialize dicts
+        dict_numerics  = dict()
+        dict_datetimes = dict()
+        dict_strings   = dict()
+
+        # for each field, add appropriate profile to the metadata aobject
+        for i in range(df.shape[0]):
+
+            # Set fieldname
+            field_name = df.loc[i, 'id']
+
+            # Skip row if id = _id
+            if field_name == "_id": # we dont want to touch '_id' 
+                continue
+            else:
+                field_type = df.loc[i, 'type']
+                field_profile = df.loc[i, 'info.profile']                
+                print(i, field_name, field_type)
+
+                if (field_type in ["int", "int4", "float8"]):
+                    dict_numerics[field_name] = field_profile         # append to dict_numerics 
+                elif (field_type in ["date", "timestamp"]):
+                    dict_datetimes[field_name] = field_profile        # append to dict_datetimes 
+                else:
+                    dict_strings[field_name] = field_profile          # append to dict_strings 
+
+        # Convert dicts into dataframes
+        df_numerics  = pd.DataFrame(dict_numerics)
+        df_datetimes = pd.DataFrame(dict_datetimes)
+        df_strings   = pd.DataFrame(dict_strings)
+
+        # Save numerics stats as html table (for displaying on City's Page)
+        df_numerics.T.to_html('html/table_numerics_stats.html')
+
+        # Save datetimes stats as html table (for displaying on City's Page)
+        df_datetimes.T.to_html('html/table_datetimes_stats.html')
+
+        # Save strings stats as html table (for displaying on City's Page)
+        df_strings.T.to_html('html/table_strings_stats.html')
+
+        print('>> Completed - HTMLs')
+
+        # Display Numeric stats as DataTable
+        plot_data_table(dict_numerics, id='1', lshow=True)
+       
+        # Display DateTimes stats as mix of DataTables and Piecharts
+
+
+        # Grid plot to visualize all datatype statistics
+
+
 
 if __name__ == "__main__":
-    Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).profile_datastore_resource()
+    # Data Resource Dump
+    #Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).profile_datastore_resources_dump()
+
+    # Visualize Single Data Resource 
+    resource_id = 'f9f84603-973c-43eb-bed0-a0ec26a2652b'
+    Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).visualize_datastore_resource(resource_id)
