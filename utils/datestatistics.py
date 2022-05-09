@@ -82,11 +82,16 @@ class DateStatistics:
 
         # calculate distinct counts for month + years in input dates
         yearmonth_count = {}
-        date_count = {}
+        year_count = {}
+        weekday_count = {}
+
         for date in working_data:
             # make working values for full dates, and the year-month of each date
-            monthyear = date.strftime("%Y-%m")
-            working_date = date.strftime("%Y-%m-%d") 
+            monthyear = date.strftime("%Y-%B")
+            year = date.strftime("%Y") 
+            weekday = date.strftime("%A")
+            hour = date.strftime("%H")
+
 
             # then find counts for each unique date and year-month value
             if monthyear in yearmonth_count.keys():
@@ -94,28 +99,35 @@ class DateStatistics:
             else:
                 yearmonth_count[monthyear] = 1
 
-            if working_date in date_count.keys():
-                date_count[working_date] += 1
+            if year in year_count.keys():
+                year_count[year] += 1
             else:
-                date_count[working_date] = 1
+                year_count[year] = 1
+
+            if weekday in weekday_count.keys():
+                weekday_count[weekday] += 1
+            else:
+                weekday_count[weekday] = 1
+
 
         # extra analyses if input dates are timestamps
-        time_count = None # init this as None, in case it ought not be populated
+        hour_count = None # init this as None, in case it ought not be populated
         if scanned_input["data_type"] == "timestamp":
-            time_count = {}
+            hour_count = {}
             for timestamp in working_data:
-                working_time = timestamp.strftime("%H:%m")
-                if working_time in time_count.keys():
-                    time_count[working_time] += 1
+                hour = timestamp.strftime("%H")
+                if hour in hour_count.keys():
+                    hour_count[hour] += 1
                 else:
-                    time_count[working_time] = 1
+                    hour_count[hour] = 1
 
         return {
             "min": min(working_data).strftime("%Y-%m-%d"),
             "max": max(working_data).strftime("%Y-%m-%d"),
             "null_count": len([value for value in input if value == None]),
             "yearmonth_count": {k: v for k, v in sorted(yearmonth_count.items(), key=lambda item: item[1], reverse=True)},
-            "date_count": {k: v for k, v in sorted(date_count.items(), key=lambda item: item[1], reverse=True)},
-            "time_count": {k: v for k, v in sorted(time_count.items(), key=lambda item: item[1], reverse=True)} if time_count is not None else None,
+            "year_count" : {k: v for k, v in sorted(year_count.items(), key=lambda item: item[1], reverse=True)}, 
+            "weekday_count" : {k: v for k, v in sorted(weekday_count.items(), key=lambda item: item[1], reverse=True)}, 
+            "hour_count": {k: v for k, v in sorted(hour_count.items(), key=lambda item: item[1], reverse=True)} if hour_count is not None else None,
         }
         
