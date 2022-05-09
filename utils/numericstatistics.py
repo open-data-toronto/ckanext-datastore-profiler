@@ -37,6 +37,11 @@ class NumericStatistics:
                 number_counts[str(number)] += 1
             else:
                 number_counts[str(number)] = 1
+        
+        # if all numbers are unique, label the data as such
+        all_unique = False
+        if any( [value > 1 for value in number_counts.values()] ):
+            all_unique = True
 
         return {
             "min": min(working_data),
@@ -44,6 +49,7 @@ class NumericStatistics:
             "median": statistics.median(working_data),
             "mean": statistics.mean(working_data),
             "null_count": len([item for item in input if item == None]),
-            #"number_counts": number_counts
+            "all_unique": all_unique,
+
         }
 
