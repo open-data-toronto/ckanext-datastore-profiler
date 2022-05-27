@@ -9,7 +9,7 @@ import io
 from utils.numericstatistics import NumericStatistics
 from utils.datestatistics import DateStatistics
 from utils.stringstatistics import StringStatistics
-from utils.utils_plotting import plot_pie_chart, plot_data_table
+from utils.utils_plotting import plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan
 
 
 
@@ -123,28 +123,36 @@ class Profiler:
 
         # Convert dicts into dataframes
         df_numerics  = pd.DataFrame(dict_numerics)
+        df_numerics  = df_numerics.T
         df_datetimes = pd.DataFrame(dict_datetimes)
+        df_datetimes = df_datetimes.T
         df_strings   = pd.DataFrame(dict_strings)
+        df_strings   = df_strings.T
 
         # Save numerics stats as html table (for displaying on City's Page)
-        df_numerics.T.to_html('html/table_numerics_stats.html')
+        #df_numerics.to_html('html/table_numerics_stats.html')
 
         # Save datetimes stats as html table (for displaying on City's Page)
-        df_datetimes.T.to_html('html/table_datetimes_stats.html')
+        #df_datetimes.to_html('html/table_datetimes_stats.html')
 
         # Save strings stats as html table (for displaying on City's Page)
-        df_strings.T.to_html('html/table_strings_stats.html')
+        #df_strings.to_html('html/table_strings_stats.html')
 
+        print(dict_numerics)
         print('>> Completed - HTMLs')
 
         # Display Numeric stats as DataTable
-        plot_data_table(dict_numerics, id='1', lshow=True)
+        #plot_data_table(dict_numerics, id='numerics', lshow=True)
        
         # Display DateTimes stats as mix of DataTables and Piecharts
+        #plot_data_table(dict_datetimes, id='datetimes', lshow=True)
 
+        # Display String stats as mix of DataTables and Piecharts
+        #plot_data_table(dict_strings, id='strings', lshow=True)
+        #display_tables_in_tabs(dict_numerics, dict_datetimes, dict_strings, lshow=True)
+        #display_strings_tables_for_ckan(dict_strings, lshow=True)
 
         # Grid plot to visualize all datatype statistics
-
 
 
 if __name__ == "__main__":
