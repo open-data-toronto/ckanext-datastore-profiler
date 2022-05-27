@@ -4,11 +4,14 @@ from pydoc import source_synopsis
 import requests
 import json
 import pandas as pd
+import io
 
 from utils.numericstatistics import NumericStatistics
 from utils.datestatistics import DateStatistics
 from utils.stringstatistics import StringStatistics
 from utils.utils_plotting import plot_pie_chart, plot_data_table
+
+
 
 class Profiler:
     def __init__(self, package_name, ckanaddress, apikey ):
@@ -50,22 +53,25 @@ class Profiler:
             fields_metadata = all_fields_metadata[resource_id]
             
             # dump data into pandas dataframe
-            df = pd.read_csv( self.url + "datastore/dump/" + resource_id + "?format=csv", na_filter=False )
+            response = self.session.get( self.url + "datastore/dump/" + resource_id + "?format=csv" ).text
+            df = pd.read_csv( io.StringIO(response), na_filter=False )
             
             # for each field, add appropriate profile to the metadata aobject
             for i in range(len(fields_metadata)):
                 fieldname = fields_metadata[i]["id"]
                 if fieldname == "_id": # we dont want to touch '_id' - we remove it later in this method
                     continue
+
+                print(fieldname)
                 
                 field_data = df[fieldname].tolist()
 
                 if fields_metadata[i]["type"] in ["int", "int4", "float8"]:
-                    fields_metadata[i]["info"]["profile"] = numericstatistics.NumericStatistics().numeric_count(field_data)
+                    fields_metadata[i]["info"]["profile"] = NumericStatistics().numeric_count(field_data)
                 elif fields_metadata[i]["type"] in ["date", "timestamp"]:
-                    fields_metadata[i]["info"]["profile"] = datestatistics.DateStatistics().date_count(field_data)
+                    fields_metadata[i]["info"]["profile"] = DateStatistics().date_count(field_data)
                 else:
-                    fields_metadata[i]["info"]["profile"] = stringstatistics.StringStatistics().execute(field_data)
+                    fields_metadata[i]["info"]["profile"] = StringStatistics().execute(field_data)
 
             # get rid of _id column - CKAN doesnt allow us to insert columns with that name
             for i in range(len(fields_metadata)):
@@ -77,7 +83,7 @@ class Profiler:
             # write edited resource metadata into ckan
             headers = {"Authorization": self.apikey}
             result = json.loads( self.session.post( self.url + "api/action/datastore_create", json={"resource_id": resource_id, "fields": fields_metadata, "force":True}, headers=headers ).text)
-            assert result["success"], "Failed to update profiles for " + resource_id
+            assert result["success"], "Failed to update profiles for " + resource_id + ":\n" + str(result)
             
     def visualize_datastore_resource(self, resource_id):
         """ 
@@ -142,9 +148,4 @@ class Profiler:
 
 
 if __name__ == "__main__":
-    # Data Resource Dump
-    #Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).profile_datastore_resources_dump()
-
-    # Visualize Single Data Resource 
-    resource_id = 'f9f84603-973c-43eb-bed0-a0ec26a2652b'
-    Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).visualize_datastore_resource(resource_id)
+    pass

@@ -1,7 +1,5 @@
 # datestatistics.py - class for summarizing lists of date and datetime/timestamp data
 
-# 
-
 # Import python libraries
 from dataclasses import dataclass
 from datetime import datetime

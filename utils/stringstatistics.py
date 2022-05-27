@@ -2,6 +2,7 @@
 
 # Import python libraries
 import re
+import json
 
 class StringStatistics:
     """
@@ -111,10 +112,32 @@ class StringStatistics:
                 "min_string_length": min( [len(words) for words in working_data] ),
                 "max_string_length": max( [len(words) for words in working_data] )
             }
+    
+    def geometry_stats(self, input):
+        geometry_types = set([object["type"] for object in input])
+
+        return {
+            "geometry_types": geometry_types,
+        }
+
+
 
     def execute(self, input):
-        output = self.word_count(input)
-        output["unique_count"] = self.unique_count(input)
-        output["mask_count"] = self.mask_count(input)
-        return output
+        # we want to differentiate normal text from geometries 
+        # geometries are geojson objects with a "type" and "coordinates" key
+        try:
+            
+            for item in input:
+                parsed = json.loads( item.replace('""', "'"))
+                assert "type" in parsed.keys() and "coordinates" in parsed.keys(), "Missing geometry keys"
+                    
+            print("Geometry column identified")
+            return self.geometry_stats(input)
+
+        except Exception as e:
+
+            output = self.word_count(input)
+            output["unique_count"] = self.unique_count(input)
+            output["mask_count"] = self.mask_count(input)
+            return output
 

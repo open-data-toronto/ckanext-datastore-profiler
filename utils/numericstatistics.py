@@ -40,15 +40,23 @@ class NumericStatistics:
         
         # if all numbers are unique, label the data as such
         all_unique = False
-        if any( [value == 1 for value in number_counts.values()] ):
+        if all( [value == 1 for value in number_counts.values()] ):
             all_unique = True
+
+        # make sure this isnt all nulls
+        null_count = len([item for item in input if item in [None, '']])
+        print(null_count)
+        print(len(input))
+        print(input)
+        if null_count == len(input):
+            return {"all_null": True}
 
         return {
             "min": min(working_data),
             "max": max(working_data),
             "median": statistics.median(working_data),
             "mean": statistics.mean(working_data),
-            "null_count": len([item for item in input if item == None]),
+            "null_count": null_count,
             "all_unique": all_unique,
 
         }
