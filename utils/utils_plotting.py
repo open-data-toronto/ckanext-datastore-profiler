@@ -333,23 +333,3 @@ def display_strings_tables_for_ckan(dict_strings, lshow=True):
     tabs = Tabs(tabs=[tab_wc, tab_mc, tab_sc])
     
     if(lshow): show(tabs)
-
-
-if __name__ == "__main__":
-
-    data_dict = {
-        'United States': 157,
-        'United Kingdom': 93,
-        'Japan': 89,
-        'China': 63,
-        'Germany': 44,
-        'India': 42,
-        'Italy': 40,
-        'Australia': 35,
-        'Brazil': 32,
-        'France': 31,
-        'Taiwan': 31,
-        'Spain': 29
-    }
-
-    plot_pie_chart(data_dict, column_name='country', lshow=True)
