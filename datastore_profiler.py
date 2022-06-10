@@ -8,7 +8,7 @@ import pandas as pd
 from utils.numericstatistics import NumericStatistics
 from utils.datestatistics import DateStatistics
 from utils.stringstatistics import StringStatistics
-from utils.utils_plotting import plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan
+from utils.utils_plotting import plot_numerics, plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan
 
 class Profiler:
     def __init__(self, package_name, ckanaddress, apikey ):
@@ -94,6 +94,9 @@ class Profiler:
         dict_datetimes = dict()
         dict_strings   = dict()
 
+        # Initialize emty keys list
+        list_data_source_keys = list()
+
         # for each field, add appropriate profile to the metadata aobject
         for i in range(df.shape[0]):
 
@@ -107,6 +110,9 @@ class Profiler:
                 field_type = df.loc[i, 'type']
                 field_profile = df.loc[i, 'info.profile']                
                 print(i, field_name, field_type)
+
+                # Append field_name to list of keys 
+                list_data_source_keys.append(field_name)
 
                 if (field_type in ["int", "int4", "float8"]):
                     dict_numerics[field_name] = field_profile         # append to dict_numerics 
@@ -132,14 +138,16 @@ class Profiler:
         # Save strings stats as html table (for displaying on City's Page)
         #df_strings.to_html('html/table_strings_stats.html')
 
-        print(dict_numerics)
+        print(dict_numerics.keys())
         print('>> Completed - HTMLs')
 
         # Display Numeric stats as DataTable
         #plot_data_table(dict_numerics, id='numerics', lshow=True)
+        plot_numerics(dict_numerics, lshow=True)
        
         # Display DateTimes stats as mix of DataTables and Piecharts
         #plot_data_table(dict_datetimes, id='datetimes', lshow=True)
+
 
         # Display String stats as mix of DataTables and Piecharts
         #plot_data_table(dict_strings, id='strings', lshow=True)

@@ -3,16 +3,16 @@ import pandas as pd
 import numpy as np
 
 # Bokeh - io, plotting, and layout
-from bokeh.io import output_file, show
+from bokeh.io import output_file, show, curdoc
 from bokeh.plotting import figure
-from bokeh.layouts import gridplot
+from bokeh.layouts import gridplot, row, column, layout
 
 # Bokeh - palette
 from bokeh.palettes import Category20c
 
 # Bokeh - transofrmation and models
 from bokeh.transform import cumsum
-from bokeh.models import ColumnDataSource, DataTable, DateFormatter, TableColumn
+from bokeh.models import ColumnDataSource, DataTable, DateFormatter, TableColumn, Label, LabelSet, CustomJS, Select
 
 # Bokeh - Widgets
 from bokeh.models.widgets import Tabs, Panel
@@ -46,6 +46,96 @@ def plot_pie_chart(data_dict, column_name='index', lshow=True):
     p.grid.grid_line_color = None
 
     if (lshow): show(p)
+
+def plot_numerics(dict_numeric, lshow=True):
+
+    # List of keys 
+    list_features = list(dict_numeric.keys())
+
+    # Select a Feature
+    select = Select(title="Select a Feature:", value=list_features[0], options=list_features)
+    select.js_on_change("value", CustomJS(code="""
+        console.log('select: value=' + this.value, this.toString())
+    """))
+
+    # Layout of numeric feature 
+    #layout_result = plot_numeric_feature(dict_numeric, feature=select.value, lshow=False)
+
+    # Layout with select 
+    layout_final = column(select, plot_numeric_feature(dict_numeric, feature=select.value, lshow=False))
+
+    if (lshow): show(layout_final)
+
+
+
+def plot_numeric_feature(dict_numeric, feature='inspID', lshow=True):
+
+    # Get info of a feature
+    dict_feature = dict_numeric.get(feature)
+    print(dict_feature)
+
+    # Convert dict to DataFrame
+    df  = pd.DataFrame(dict_feature, index=dict_feature.keys()).head(1)
+
+    # Save transposed DataFrame
+    df_t = df.T.reset_index()
+    df_t.columns = ['stats', 'values']
+    
+    # Create CDS using DataFrame
+    source  = ColumnDataSource(data=df)
+
+    # Display for null_count & all_unique
+    rows_nulls_uniques = [TableColumn(field="null_count", title="Null Count"),
+                          TableColumn(field="all_unique", title="All Unique"),]
+
+    # Finalize DataTable with dimensions
+    display_nulls_uniques = DataTable(source=source, columns=rows_nulls_uniques, width=550, height=50)
+
+    # Create custom lists
+    list_keys_m4 = [key for key, val in dict_feature.items() if key.startswith('m')]
+    list_vals_m4 = [val for key, val in dict_feature.items() if key.startswith('m')]
+
+    # Display for m4 = min, median, mean, max
+    display_m4 = plot_m4_dot(list_keys_m4, list_vals_m4, lshow=False)
+
+    # Output visual will be saved as below
+    # output_file(f"html/mockup_datastore_{id}_key_{feature}.html")
+
+    # Layout of numeric key 
+    layout_numeric_feature = column(display_nulls_uniques, display_m4)
+    curdoc().add_root(layout_numeric_feature)
+
+    # Return or show datatable
+    if (lshow): show(layout_numeric_feature)
+
+    #return layout_numeric_feature
+
+
+def plot_m4_dot(factors, x, lshow=True):
+    """ Plot Min, Median, Mean, Max as per Mockup"""
+
+    # Columns data source
+    source = ColumnDataSource(data=dict(x=x, factors=factors, names=[str(val) for val in x]))
+
+    # Range: min_x and max_x 
+    min_x = min(x)-min(x)/2.
+    max_x = max(x)*1.25
+
+    # Figure
+    p = figure(title="Dot Plot - Min, Median, Mean, Max", tools="", toolbar_location=None,
+               y_range=factors, x_range=[min_x, max_x], width=550, height=250)
+
+    p.segment(0, factors, x, factors, line_width=2, line_color="green", )
+    p.circle(x, factors, size=15, fill_color="orange", line_color="green", line_width=3, )
+
+    # Add LabelSet
+    labels = LabelSet(x='x', y='factors', text='names', x_offset=5, y_offset=5, source=source, render_mode='canvas')
+    p.add_layout(labels)
+
+    if (lshow): show(p)
+
+    return p
+
 
 def plot_data_table(data_dict, id='1', lshow=True):
     """
