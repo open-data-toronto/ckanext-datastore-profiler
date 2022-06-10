@@ -9,7 +9,7 @@ import io
 from utils.numericstatistics import NumericStatistics
 from utils.datestatistics import DateStatistics
 from utils.stringstatistics import StringStatistics
-from utils.utils_plotting import plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan
+from utils.utils_plotting import plot_numeric_feature, plot_numerics, plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan, plot_string_feature, plot_timeseries_feature
 
 
 
@@ -100,6 +100,9 @@ class Profiler:
         dict_datetimes = dict()
         dict_strings   = dict()
 
+        # Initialize emty keys list
+        list_data_source_keys = list()
+
         # for each field, add appropriate profile to the metadata aobject
         for i in range(df.shape[0]):
 
@@ -114,6 +117,9 @@ class Profiler:
                 field_profile = df.loc[i, 'info.profile']                
                 print(i, field_name, field_type)
 
+                # Append field_name to list of keys 
+                list_data_source_keys.append(field_name)
+
                 if (field_type in ["int", "int4", "float8"]):
                     dict_numerics[field_name] = field_profile         # append to dict_numerics 
                 elif (field_type in ["date", "timestamp"]):
@@ -121,38 +127,19 @@ class Profiler:
                 else:
                     dict_strings[field_name] = field_profile          # append to dict_strings 
 
-        # Convert dicts into dataframes
-        df_numerics  = pd.DataFrame(dict_numerics)
-        df_numerics  = df_numerics.T
-        df_datetimes = pd.DataFrame(dict_datetimes)
-        df_datetimes = df_datetimes.T
-        df_strings   = pd.DataFrame(dict_strings)
-        df_strings   = df_strings.T
+        # # Convert dicts into dataframes
+        # df_numerics  = pd.DataFrame(dict_numerics)
+        # df_numerics  = df_numerics.T
+        # df_datetimes = pd.DataFrame(dict_datetimes)
+        # df_datetimes = df_datetimes.T
+        # df_strings   = pd.DataFrame(dict_strings)
+        # df_strings   = df_strings.T
 
-        # Save numerics stats as html table (for displaying on City's Page)
-        #df_numerics.to_html('html/table_numerics_stats.html')
-
-        # Save datetimes stats as html table (for displaying on City's Page)
-        #df_datetimes.to_html('html/table_datetimes_stats.html')
-
-        # Save strings stats as html table (for displaying on City's Page)
-        #df_strings.to_html('html/table_strings_stats.html')
-
-        print(dict_numerics)
+        # Display Stats as per MockUp
+        plot_numeric_feature(dict_numerics, feature='inspID', lshow=True)
+        #plot_timeseries_feature(dict_datetimes, feature='inspDate', lshow=True)
+        #plot_string_feature(dict_strings, feature='enfrID', lshow=True)
         print('>> Completed - HTMLs')
-
-        # Display Numeric stats as DataTable
-        #plot_data_table(dict_numerics, id='numerics', lshow=True)
-       
-        # Display DateTimes stats as mix of DataTables and Piecharts
-        #plot_data_table(dict_datetimes, id='datetimes', lshow=True)
-
-        # Display String stats as mix of DataTables and Piecharts
-        #plot_data_table(dict_strings, id='strings', lshow=True)
-        #display_tables_in_tabs(dict_numerics, dict_datetimes, dict_strings, lshow=True)
-        #display_strings_tables_for_ckan(dict_strings, lshow=True)
-
-        # Grid plot to visualize all datatype statistics
 
 
 if __name__ == "__main__":
