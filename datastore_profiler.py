@@ -1,6 +1,7 @@
 # datastore_profiler.py - for input package name's datastore resources, add profile object to each datastore field metadata
 from fileinput import filename
 from pydoc import source_synopsis
+from ssl import SSLWantWriteError
 import requests
 import json
 import pandas as pd
@@ -121,16 +122,9 @@ class Profiler:
                 else:
                     dict_strings[field_name] = field_profile          # append to dict_strings 
 
-        # # Convert dicts into dataframes
-        # df_numerics  = pd.DataFrame(dict_numerics)
-        # df_numerics  = df_numerics.T
-        # df_datetimes = pd.DataFrame(dict_datetimes)
-        # df_datetimes = df_datetimes.T
-        # df_strings   = pd.DataFrame(dict_strings)
-        # df_strings   = df_strings.T
-
         # Display Stats as per MockUp
-        plot_numeric_feature(dict_numerics, feature='inspID', lshow=True)
+        #plot_numeric_feature(dict_numerics, feature='inspID', lshow=True)
+        plot_numerics(dict_numerics, lshow=True)
         #plot_timeseries_feature(dict_datetimes, feature='inspDate', lshow=True)
         #plot_string_feature(dict_strings, feature='enfrID', lshow=True)
         print('>> Completed - HTMLs')
