@@ -3,11 +3,12 @@
 # Import python libraries
 import re
 import json
+from collections import Counter
 
 class StringStatistics:
     """
         This class is a Collection of methods that compute statistics for strings 
-    """
+    """        
 
     def unique_count(self, input):
         """
@@ -18,15 +19,10 @@ class StringStatistics:
             output (dict): output dict - each key is a string from the input, and the number of times it appears as the value                           
         """
 
-        # init output
-        output = {}
+        # count how many times each string appears in input    
+        output = Counter(input)
 
-        # build list of unique strings
-        unique_values = list(set(input))
-
-        # count how many times each string appears in input
-        for unique_value in unique_values:
-            output[unique_value] = len( [item for item in input if item == unique_value] )
+        print("--------- unique value counts calculated")
 
         # if all strings are unique, label the data as such
         if all( [value == 1 for value in output.values()] ):
@@ -41,6 +37,7 @@ class StringStatistics:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
 
         #return output
+        print("--------- Returning unique strings output ........")
         return {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)}
 
 
@@ -54,6 +51,7 @@ class StringStatistics:
         """
         
         # init output
+        print("......... mask count start")
         output = {}
 
         # for each string
@@ -71,6 +69,7 @@ class StringStatistics:
             output["null_count"] = len(input) - len([x for x in input if x]) 
 
         #return output
+        print("......... mask count end!")
         return {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)}
 
     
@@ -83,6 +82,7 @@ class StringStatistics:
             Returns:
                 output (dict): each dict key is a "word" in any string, each value is how often it appears. A "word" is any string separated by spaces
         """
+        print("--------- Word Count started")
         output = {}
 
         # remove nulls from working data
@@ -91,18 +91,22 @@ class StringStatistics:
         # split each string by spaces, and make sure all the resulting "words" are in a single list
         working_words = " ".join(working_data).split(" ")
 
+        print("---------- word count strings split into words")
+
         # build list of unique strings, and of "words" to skip
-        unique_values = list(set(working_words))
+        unique_values = Counter(working_words)
         words_to_skip = ["the", "this", "that", "a", "it"]
 
         # count how many times each string appears in input
-        for unique_value in unique_values:
-            if unique_value not in words_to_skip:
-                output[unique_value] = len( [item for item in working_words if item == unique_value] )
+        for word in words_to_skip:
+            if word in unique_values.keys():
+                unique_values.pop( word )
         
         # add number of empty values to output
         if None in input:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
+
+        print("--------- Word Count ending...")
 
         # return output sorted by count
         return {
@@ -114,7 +118,8 @@ class StringStatistics:
             }
     
     def geometry_stats(self, input):
-        geometry_types = set([object["type"] for object in input])
+        geometry_types = list(set([ json.loads(object.replace('""', "'"))["type"] for object in input]))
+        print(" -------------- ------------ successfully calculated geometry types")
 
         return {
             "geometry_types": geometry_types,
@@ -127,7 +132,7 @@ class StringStatistics:
         # geometries are geojson objects with a "type" and "coordinates" key
         try:
             
-            for item in input:
+            for item in input[:10]:
                 parsed = json.loads( item.replace('""', "'"))
                 assert "type" in parsed.keys() and "coordinates" in parsed.keys(), "Missing geometry keys"
                     
@@ -135,9 +140,12 @@ class StringStatistics:
             return self.geometry_stats(input)
 
         except Exception as e:
-
-            output = self.word_count(input)
-            output["unique_count"] = self.unique_count(input)
+            print("============= Non Geometric column identified")
+            output = self.unique_count(input)
+            if output.get("all_unique", None) or output.get("all_numeric", None):
+                print("-------------- ALL UNIQUE!")
+                return output
+            output["word_count"] = self.word_count(input)
             output["mask_count"] = self.mask_count(input)
             return output
 

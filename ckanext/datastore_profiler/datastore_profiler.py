@@ -71,15 +71,19 @@ def update_profile(context, data_dict):
             if fieldname == "_id": # we dont want to touch '_id' - we remove it later in this method
                 continue
 
+            print("================================ FIELD:")
             print(fieldname)
             
             field_data = df[fieldname].tolist()
 
             if fields_metadata[i]["type"] in ["int", "int4", "float8"]:
+                print("------- FLOAT")
                 fields_metadata[i]["info"]["profile"] = NumericStatistics().numeric_count(field_data)
             elif fields_metadata[i]["type"] in ["date", "timestamp"]:
+                print("------- TIMESTAMP")
                 fields_metadata[i]["info"]["profile"] = DateStatistics().date_count(field_data)
             else:
+                print("------- STRING")
                 fields_metadata[i]["info"]["profile"] = StringStatistics().execute(field_data)
 
         # get rid of _id column - CKAN doesnt allow us to insert columns with that name
@@ -93,7 +97,7 @@ def update_profile(context, data_dict):
         
         # write edited resource metadata into ckan
         result = tk.get_action("datastore_create")(context, {"resource_id": resource_id, "fields": fields_metadata, "force":True})
-        print(result)
+
         
         # TODO: save and deploy this extension, then test it via an API call to DEV
 
