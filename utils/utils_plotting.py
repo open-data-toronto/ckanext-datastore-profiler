@@ -24,6 +24,7 @@ def plot_numerics(dict_numeric, lshow=True):
 
     # Convert dict to DF
     df_numeric = pd.DataFrame.from_dict(dict_numeric, orient="index").reset_index()    
+    df_numeric = df_numeric.fillna(0.0)
     print(df_numeric)
 
     # List of keys 
@@ -38,8 +39,8 @@ def plot_numerics(dict_numeric, lshow=True):
 
     # Create CDS using DataFrame
     source = ColumnDataSource(data=df_numeric)
-    filtered_source = ColumnDataSource(data=df_numeric)
-    print('Before filter:\n', dict_numeric)
+    filtered_source = ColumnDataSource(data=df_feature)
+    print('Before filter:\n', filtered_source.data)
 
     # Display for null_count & all_unique
     table_columns = [TableColumn(field=col, title=col.replace('_'," ")) for col in list(df_numeric.columns) if col in ['index','null_count', 'all_unique']]
@@ -47,25 +48,19 @@ def plot_numerics(dict_numeric, lshow=True):
     # Finalize DataTable with dimensions
     datatable_nulls_uniques = DataTable(source=filtered_source, columns=table_columns, width=500, height=100)
 
-    # Create custom lists
-    list_m4 = [col for col in list(df_feature.columns) if col.startswith('m')]
-    list_keys_m4 = list_m4
-    list_vals_m4 = list(df_feature[list_m4].iloc[0])
-
     # Display for m4 = min, median, mean, max
-    display_m4 = plot_m4_dot(list_keys_m4, list_vals_m4, lshow=False)
-
+    display_m4 = plot_m4_dot(filtered_source, lshow=False)
 
     # Select a Feature
-    selected_feature = Select(title="Select a Feature:", value=list_features[0], options=list_features)
+    selected_feature = Select(title="Select a Feature:", value=feature, options=list_features)
 
     # JS callback code
     callback_code = """
         var filter_dict = {};
-        var original_data = source.data;
-        var feature = select_obj.value;
+        var original_data = source_original.data;
+        var feature = cb_obj.value;
         var feature_id = 0;
-        console.log('Selected Feature:', select_obj.value, feature );
+        console.log('Selected Feature:', cb_obj.value, feature );
         console.log('Data:', original_data)
 
         // Get index of the feature
@@ -81,21 +76,19 @@ def plot_numerics(dict_numeric, lshow=True):
         // Get data w.r.t the feature_id
         for (var key in original_data) {            
             filter_dict[key] = [];
-            filter_dict[key] = original_data[key][feature_id];
+            filter_dict[key] = [original_data[key][feature_id]];
         }
         console.log(' Filter  dict:',filter_dict)
 
-        source.data = filter_dict;
-        //filtered_source.change.emit();
-        target_obj1.change.emit();
+        source_filtered.data = filter_dict; 
+        source_filtered.change.emit();
     """
-    callback = CustomJS(args=dict(source=filtered_source,
-                                  select_obj=selected_feature, 
-                                  target_obj1=datatable_nulls_uniques), 
+    callback = CustomJS(args=dict(source_original=source, 
+                                  source_filtered=filtered_source), 
                         code=callback_code)
     selected_feature.js_on_change('value', callback)
 
-    print('After filtereed:\n', filtered_source.data.keys())
+    print('After filtereed:\n', filtered_source.data)
 
     # # Output visual will be saved as below
     # output_file(f"html/mockup_numeric_feature={feature}.html")
@@ -254,11 +247,26 @@ def df_to_table(df0, feature_old, feature_new1, feature_new2):
     return display_table
 
 
-def plot_m4_dot(factors, x, lshow=True):
+def plot_m4_dot(source, lshow=True):
     """ Plot Min, Median, Mean, Max as per Mockup"""
 
+    print('inside:', source.data)
+    a = input('Etner someot')
+
+    # create local list of keys and vals
+    list_all_keys = list(source.data.keys())
+    list_all_vals = [x[0] for x in list(source.data.values())]
+
+    # list of indices of min, max, mean, median
+    list_idx_m4 = [idx for idx in range(len(list_all_keys)) if list_all_keys[idx].startswith('m')]
+    print(list_idx_m4)
+
+    # Create custom lists for plotting
+    factors = [list_all_keys[idx] for idx in list_idx_m4]
+    x = [list_all_vals[idx] for idx in list_idx_m4]
+
     # Columns data source
-    source = ColumnDataSource(data=dict(x=x, factors=factors, names=[str(val) for val in x]))
+    source_new = ColumnDataSource(data=dict(x=x, factors=factors, names=[str(val) for val in x]))
 
     # Range: min_x and max_x 
     min_x = min(x)-min(x)/2.
@@ -268,11 +276,11 @@ def plot_m4_dot(factors, x, lshow=True):
     p = figure(title="Dot Plot - Min, Median, Mean, Max", tools="", toolbar_location=None,
                y_range=factors, x_range=[min_x, max_x], width=500, height=250,)
 
-    p.segment(0, factors, x, factors, line_width=2, line_color="green", )
-    p.circle(x, factors, size=15, fill_color="orange", line_color="green", line_width=3, )
+    # p.segment(x0=0, factors, x, factors, line_width=2, line_color="green", source=source_new,)
+    p.circle(x='x', y='factors', size=15, fill_color="orange", line_color="green", line_width=3, source=source_new,)
 
     # Add LabelSet
-    labels = LabelSet(x='x', y='factors', text='names', x_offset=5, y_offset=5, source=source, render_mode='canvas')
+    labels = LabelSet(x='x', y='factors', text='names', x_offset=5, y_offset=5, source=source_new, render_mode='canvas')
     p.add_layout(labels)
 
     if (lshow): show(p)
