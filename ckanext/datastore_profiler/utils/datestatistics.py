@@ -18,8 +18,6 @@ class DateStatistics:
         """
             determines whether input list contains dates or timestamps (aka datetimes)
         """
-        results = []
-        outputs = []
         format_dict = {
             "%Y-%m-%dT%H:%M:%S.%f": "%Y-%m-%dT%H:%M:%S.%f",
             "%Y-%m-%d %H:%M:%S.%f": "%Y-%m-%dT%H:%M:%S.%f",
@@ -37,22 +35,23 @@ class DateStatistics:
             "%d%b%Y": "%Y-%m-%d",
         }
 
-        print("-------------- starting input value cleaning")
-        for value in [str(val) for val in input if val]: # this list comp remove Null values from this
-            # clean each value
-            value = value.replace("/", "-")
-            for format in format_dict.keys():
-                # check each value against each possible date or datetime format     
-                try:  
+        for format in format_dict.keys():
+            outputs = []
+            results = []
+            try:
+                for value in [str(val).replace("/", "-") for val in input if val]: # this list comp remove Null values from this
+                    # clean each value
+                    #value = value.replace("/", "-")
+                    
                     output = datetime.strptime(value, format)
                     outputs.append( output )
 
                     results.append( format_dict[format] )
+                break
                 
-                except ValueError as e:
-                    pass
+            except ValueError as e:
+                pass
         
-        print("-------------- ending input value cleaning")
 
         
         if all( [result == "%Y-%m-%d" for result in results] ):
