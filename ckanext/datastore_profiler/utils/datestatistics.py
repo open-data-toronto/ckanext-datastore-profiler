@@ -39,9 +39,8 @@ class DateStatistics:
             outputs = []
             results = []
             try:
-                for value in [str(val).replace("/", "-") for val in input if val]: # this list comp remove Null values from this
+                for value in [str(val).replace("/", "-") for val in input if str(val).replace("/", "-") not in [None, "", "nan"]]: # this list comp remove Null values from this
                     # clean each value
-                    #value = value.replace("/", "-")
                     
                     output = datetime.strptime(value, format)
                     outputs.append( output )
@@ -79,7 +78,7 @@ class DateStatistics:
         scanned_input = self.date_or_timestamp(input)
 
         # make sure input contains only dates
-        scanned_input["data_type"] in ["date", "timestamp"], "Inputs to date_count isn't all strings representing dates and isn't all strings representing datetimes/timestamps"
+        assert scanned_input["data_type"] in ["date", "timestamp"], "Inputs to date_count isn't all strings representing dates and isn't all strings representing datetimes/timestamps"
 
         # remove nulls from working data
         working_data = [value for value in scanned_input["data"] if value]
