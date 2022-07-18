@@ -3,11 +3,12 @@
 # Import python libraries
 import re
 import json
+from collections import Counter
 
 class StringStatistics:
     """
         This class is a Collection of methods that compute statistics for strings 
-    """
+    """        
 
     def unique_count(self, input):
         """
@@ -18,15 +19,9 @@ class StringStatistics:
             output (dict): output dict - each key is a string from the input, and the number of times it appears as the value                           
         """
 
-        # init output
-        output = {}
+        # count how many times each string appears in input    
+        output = Counter(input)
 
-        # build list of unique strings
-        unique_values = list(set(input))
-
-        # count how many times each string appears in input
-        for unique_value in unique_values:
-            output[unique_value] = len( [item for item in input if item == unique_value] )
 
         # if all strings are unique, label the data as such
         if all( [value == 1 for value in output.values()] ):
@@ -56,15 +51,9 @@ class StringStatistics:
         # init output
         output = {}
 
-        # for each string
-        for string in [str(x) for x in input if x]:
-            pattern = re.sub( '[a-zA-Z]', "L", string )
-            pattern = re.sub( '[0-9]', "D", pattern )
-
-            if pattern in output.keys():
-                output[ pattern ] += 1
-            else:
-                output[ pattern ] = 1
+        # for each string, create masks by replacing letters with "L" and digits with "D", then count each mask
+        masks = [ re.sub('[0-9]', "D", re.sub('[a-zA-Z]', "L", str(x))) for x in input if x ]
+        output = Counter(masks)
         
         # add number of empty values to output
         if None in input:
@@ -91,18 +80,21 @@ class StringStatistics:
         # split each string by spaces, and make sure all the resulting "words" are in a single list
         working_words = " ".join(working_data).split(" ")
 
+
         # build list of unique strings, and of "words" to skip
-        unique_values = list(set(working_words))
+        output = Counter(working_words)
         words_to_skip = ["the", "this", "that", "a", "it"]
 
         # count how many times each string appears in input
-        for unique_value in unique_values:
-            if unique_value not in words_to_skip:
-                output[unique_value] = len( [item for item in working_words if item == unique_value] )
+        for word in words_to_skip:
+            if word in output.keys():
+                output.pop( word )
+
         
         # add number of empty values to output
         if None in input:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
+
 
         # return output sorted by count
         return {
@@ -114,7 +106,7 @@ class StringStatistics:
             }
     
     def geometry_stats(self, input):
-        geometry_types = set([object["type"] for object in input])
+        geometry_types = list(set([ json.loads(object.replace('""', "'"))["type"] for object in input]))
 
         return {
             "geometry_types": geometry_types,
@@ -127,17 +119,20 @@ class StringStatistics:
         # geometries are geojson objects with a "type" and "coordinates" key
         try:
             
-            for item in input:
+            for item in input[:10]:
                 parsed = json.loads( item.replace('""', "'"))
                 assert "type" in parsed.keys() and "coordinates" in parsed.keys(), "Missing geometry keys"
                     
-            print("Geometry column identified")
+
             return self.geometry_stats(input)
 
         except Exception as e:
 
-            output = self.word_count(input)
-            output["unique_count"] = self.unique_count(input)
+            output = self.unique_count(input)
+            if output.get("all_unique", None) or output.get("all_numeric", None):
+    
+                return output
+            output["word_count"] = self.word_count(input)
             output["mask_count"] = self.mask_count(input)
             return output
 

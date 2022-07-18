@@ -45,9 +45,6 @@ class NumericStatistics:
 
         # make sure this isnt all nulls
         null_count = len([item for item in input if item in [None, '']])
-        print(null_count)
-        print(len(input))
-        print(input)
         if null_count == len(input):
             return {"all_null": True}
 
