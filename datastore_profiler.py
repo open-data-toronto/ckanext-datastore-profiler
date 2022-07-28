@@ -9,7 +9,7 @@ import pandas as pd
 from utils.numericstatistics import NumericStatistics
 from utils.datestatistics import DateStatistics
 from utils.stringstatistics import StringStatistics
-from utils.utils_plotting import plot_numeric_feature, plot_numerics, plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan, plot_string_feature, plot_timeseries_feature
+from utils.utils_plotting import plot_numeric_feature, plot_datasource_features, plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan, plot_string_feature, plot_timeseries_feature
 
 class Profiler:
     def __init__(self, package_name, ckanaddress, apikey ):
@@ -80,54 +80,57 @@ class Profiler:
             result = json.loads( self.session.post( self.url + "api/action/datastore_create", json={"resource_id": resource_id, "fields": fields_metadata, "force":True}, headers=headers ).text)
             assert result["success"], "Failed to update profiles for " + resource_id
             
-    def visualize_datastore_resource(self, resource_id):
-        """ 
-            Run profiler on a data resource with resource_id
-        """
-        # dump data into pandas dataframe
+def visualize_datastore_resource(resource_id):
+    """ 
+        Run profiler on a data resource with resource_id
+    """
+    # dump data into pandas dataframe
+    if (resource_id == '1'):
+        fields_json = pd.read_json('./data/datastore_profiler_response.json')['result']['fields']
+    else:
         fields_json = pd.read_json( self.url + "api/action/datastore_search?id=" + resource_id + "&limit=0")['result']['fields']
-        
-        # Flatten data
-        df = pd.json_normalize(fields_json, max_level=1)
+    
+    # Flatten data
+    df = pd.json_normalize(fields_json, max_level=1)
 
-        # Initialize dicts
-        dict_numerics  = dict()
-        dict_datetimes = dict()
-        dict_strings   = dict()
+    # Initialize dicts
+    dict_numerics  = dict()
+    dict_datetimes = dict()
+    dict_strings   = dict()
 
-        # Initialize emty keys list
-        list_data_source_keys = list()
+    # Initialize emty keys list
+    list_data_source_keys = list()
 
-        # for each field, add appropriate profile to the metadata aobject
-        for i in range(df.shape[0]):
+    # for each field, add appropriate profile to the metadata aobject
+    for i in range(df.shape[0]):
 
-            # Set fieldname
-            field_name = df.loc[i, 'id']
+        # Set fieldname
+        field_name = df.loc[i, 'id']
 
-            # Skip row if id = _id
-            if field_name == "_id": # we dont want to touch '_id' 
-                continue
+        # Skip row if id = _id
+        if field_name == "_id": # we dont want to touch '_id' 
+            continue
+        else:
+            field_type = df.loc[i, 'type']
+            field_profile = df.loc[i, 'info.profile']                
+            print(i, field_name, field_type)
+
+            # Append field_name to list of keys 
+            list_data_source_keys.append(field_name)
+
+            if (field_type in ["int", "int4", "float8"]):
+                dict_numerics[field_name] = field_profile         # append to dict_numerics 
+            elif (field_type in ["date", "timestamp"]):
+                dict_datetimes[field_name] = field_profile        # append to dict_datetimes 
             else:
-                field_type = df.loc[i, 'type']
-                field_profile = df.loc[i, 'info.profile']                
-                print(i, field_name, field_type)
+                dict_strings[field_name] = field_profile          # append to dict_strings 
 
-                # Append field_name to list of keys 
-                list_data_source_keys.append(field_name)
+    # Display Stats as per MockUp
+    dtype = 'datetimes'
+    dict_features = dict_datetimes
 
-                if (field_type in ["int", "int4", "float8"]):
-                    dict_numerics[field_name] = field_profile         # append to dict_numerics 
-                elif (field_type in ["date", "timestamp"]):
-                    dict_datetimes[field_name] = field_profile        # append to dict_datetimes 
-                else:
-                    dict_strings[field_name] = field_profile          # append to dict_strings 
-
-        # Display Stats as per MockUp
-        #plot_numeric_feature(dict_numerics, feature='inspID', lshow=True)
-        plot_numerics(dict_numerics, lshow=True)
-        #plot_timeseries_feature(dict_datetimes, feature='inspDate', lshow=True)
-        #plot_string_feature(dict_strings, feature='enfrID', lshow=True)
-        print('>> Completed - HTMLs')
+    plot_datasource_features(dict_features, lshow=True, dtype='datetimes')
+    print('>> Completed - HTMLs')
 
 
 if __name__ == "__main__":
@@ -135,5 +138,5 @@ if __name__ == "__main__":
     #Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).profile_datastore_resources_dump()
 
     # Visualize Single Data Resource 
-    resource_id = 'f9f84603-973c-43eb-bed0-a0ec26a2652b'
-    Profiler("bodysafe", "https://ckanadmin0.intra.dev-toronto.ca/", "" ).visualize_datastore_resource(resource_id)
+    resource_id = '1'
+    visualize_datastore_resource(resource_id)

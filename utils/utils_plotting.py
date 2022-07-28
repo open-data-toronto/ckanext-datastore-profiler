@@ -20,36 +20,62 @@ from bokeh.models import ColumnDataSource, DataTable, DateFormatter, TableColumn
 from bokeh.models.widgets import Tabs, Panel
 
 
-def plot_numerics(dict_numeric, lshow=True):
+def plot_datasource_features(dict_features, lshow=True, dtype='numerics'):
 
     # Convert dict to DF
-    df_numeric = pd.DataFrame.from_dict(dict_numeric, orient="index").reset_index()    
-    df_numeric = df_numeric.fillna(0.0)
-    print(df_numeric)
+    df_features = pd.DataFrame.from_dict(dict_features, orient="index").reset_index()    
+    df_features = df_features.fillna(0.0)
 
     # List of keys 
-    list_features = list(df_numeric['index'])
-    print(list_features)
+    list_features = list(df_features['index'])
 
     # Get info of a feature
     feature = list_features[0]
 
     # Filter Data
-    df_feature = df_numeric[df_numeric['index'] == feature]
+    df_feature = df_features[df_features['index'] == feature]
 
     # Create CDS using DataFrame
-    source = ColumnDataSource(data=df_numeric)
+    source = ColumnDataSource(data=df_features)
     filtered_source = ColumnDataSource(data=df_feature)
     print('Before filter:\n', filtered_source.data)
 
-    # Display for null_count & all_unique
-    table_columns = [TableColumn(field=col, title=col.replace('_'," ")) for col in list(df_numeric.columns) if col in ['index','null_count', 'all_unique']]
+    if (dtype == 'numerics'):
+        # Display for null_count & all_unique
+        table_columns_ncau = [TableColumn(field=col, title=col.replace('_'," ")) for col in list(df_features.columns) if col in ['index','null_count', 'all_unique']]
+        datatable_ncau = DataTable(source=filtered_source, columns=table_columns_ncau, width=500, height=100)
 
-    # Finalize DataTable with dimensions
-    datatable_nulls_uniques = DataTable(source=filtered_source, columns=table_columns, width=500, height=100)
+        # Display for m4 = min, median, mean, max
+        table_columns_m4 = [TableColumn(field=col, title=col.replace('_'," ")) for col in list(df_features.columns) if col in ['index','min','max','median','mean']]
+        datatable_m4 = DataTable(source=filtered_source, columns=table_columns_m4, width=500, height=100)
+    
+    elif (dtype == 'datetimes'):
+        # Display for null_count, min & max
+        table_columns_ncmm = [TableColumn(field=col, title=col.replace('_'," ")) for col in list(df_features.columns) if col in ['index','null_count', 'min', 'max']]
+        datatable_ncmm = DataTable(source=filtered_source, columns=table_columns_ncmm, width=500, height=100)
 
-    # Display for m4 = min, median, mean, max
-    display_m4 = plot_m4_dot(filtered_source, lshow=False)
+        # Display Year Counts table
+        list_year = list(filtered_source.data.get('year_count')[0].keys())
+        list_year_counts = list(filtered_source.data.get('year_count')[0].values())
+        source_yc = ColumnDataSource({'year': list_year, 'count':list_year_counts})
+        table_columns_yc = [TableColumn(field="year", title="Year"), TableColumn(field="count", title="Count")]
+        datatable_yc = DataTable(source=source_yc, columns=table_columns_yc, width=150, height=250)
+
+        # Display Weekend Counts table
+        list_wkd = list(filtered_source.data.get('weekday_count')[0].keys())
+        list_wkd_counts = list(filtered_source.data.get('weekday_count')[0].values())
+        source_wkd = ColumnDataSource({'weekday': list_wkd, 'count':list_wkd_counts})
+        table_columns_wkd = [TableColumn(field="weekday", title="Weekday"), TableColumn(field="count", title="Count")]
+        datatable_wkd = DataTable(source=source_wkd, columns=table_columns_wkd, width=150, height=250)
+
+        # Display Hour Counts table
+        list_hour = list(filtered_source.data.get('hour_count')[0].keys())
+        list_hour_counts = list(filtered_source.data.get('hour_count')[0].values())
+        source_hour = ColumnDataSource({'hour': list_year, 'count':list_year_counts})
+        table_columns_hour = [TableColumn(field="hour", title="Hour"), TableColumn(field="count", title="Count")]
+        datatable_hour = DataTable(source=source_hour, columns=table_columns_hour, width=150, height=250)
+
+        a = input('Enter ....')
 
     # Select a Feature
     selected_feature = Select(title="Select a Feature:", value=feature, options=list_features)
@@ -61,7 +87,7 @@ def plot_numerics(dict_numeric, lshow=True):
         var feature = cb_obj.value;
         var feature_id = 0;
         console.log('Selected Feature:', cb_obj.value, feature );
-        console.log('Data:', original_data)
+        console.log('Original Data:', original_data)
 
         // Get index of the feature
         for (var key in original_data) {            
@@ -94,10 +120,13 @@ def plot_numerics(dict_numeric, lshow=True):
     # output_file(f"html/mockup_numeric_feature={feature}.html")
 
     # Layout of numeric key 
-    layout_numeric_feature = column(datatable_nulls_uniques, display_m4)
+    if (dtype == 'numerics'):
+        layout_feature = column(datatable_ncau, datatable_m4)
+    elif (dtype == 'datetimes'):
+        layout_feature = column(datatable_ncmm, row(datatable_yc, datatable_wkd, datatable_hour))
 
     # Layout with select 
-    layout_final = row(selected_feature, layout_numeric_feature)
+    layout_final = row(selected_feature, layout_feature)
     curdoc().add_root(layout_final)
 
     if (lshow): show(layout_final)
@@ -250,7 +279,7 @@ def df_to_table(df0, feature_old, feature_new1, feature_new2):
 def plot_m4_dot(source, lshow=True):
     """ Plot Min, Median, Mean, Max as per Mockup"""
 
-    print('inside:', source.data)
+    print('inside:', source.data.keys())
     a = input('Etner someot')
 
     # create local list of keys and vals
@@ -259,7 +288,6 @@ def plot_m4_dot(source, lshow=True):
 
     # list of indices of min, max, mean, median
     list_idx_m4 = [idx for idx in range(len(list_all_keys)) if list_all_keys[idx].startswith('m')]
-    print(list_idx_m4)
 
     # Create custom lists for plotting
     factors = [list_all_keys[idx] for idx in list_idx_m4]
@@ -267,6 +295,8 @@ def plot_m4_dot(source, lshow=True):
 
     # Columns data source
     source_new = ColumnDataSource(data=dict(x=x, factors=factors, names=[str(val) for val in x]))
+    print('source_new:', source_new.data)
+    a = input('')
 
     # Range: min_x and max_x 
     min_x = min(x)-min(x)/2.
