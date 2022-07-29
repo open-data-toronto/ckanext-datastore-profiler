@@ -1,0 +1,85 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    
+      <meta charset="utf-8">
+      <title>Bokeh Plot</title>
+      
+      
+        
+          
+        
+        
+          
+        <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+        
+      
+      
+    
+  </head>
+  
+  
+  <body>
+    
+      
+        
+          
+          
+            
+              <div class="bk-root" id="9bfc9596-8e29-4449-9e10-bb941de636c1" data-root-id="1002"></div>
+            
+          
+        
+      
+      
+        <script type="application/json" id="1161">
+          {"c5c55203-0257-43f9-bdb1-ce0db76c9a3e":{"defs":[],"roots":{"references":[{"attributes":{"field":"angle","include_zero":true},"id":"1024","type":"CumSum"},{"attributes":{"below":[{"id":"1013"}],"center":[{"id":"1016"},{"id":"1020"},{"id":"1042"}],"height":350,"left":[{"id":"1017"}],"renderers":[{"id":"1031"}],"title":{"id":"1003"},"toolbar":{"id":"1022"},"toolbar_location":null,"x_range":{"id":"1005"},"x_scale":{"id":"1009"},"y_range":{"id":"1007"},"y_scale":{"id":"1011"}},"id":"1002","subtype":"Figure","type":"Plot"},{"attributes":{},"id":"1038","type":"BasicTickFormatter"},{"attributes":{"axis":{"id":"1017"},"coordinates":null,"dimension":1,"grid_line_color":null,"group":null,"ticker":null},"id":"1020","type":"Grid"},{"attributes":{"coordinates":null,"group":null,"items":[{"id":"1043"}]},"id":"1042","type":"Legend"},{"attributes":{},"id":"1040","type":"UnionRenderers"},{"attributes":{},"id":"1039","type":"AllLabels"},{"attributes":{},"id":"1014","type":"BasicTicker"},{"attributes":{},"id":"1007","type":"DataRange1d"},{"attributes":{},"id":"1041","type":"Selection"},{"attributes":{"end_angle":{"expr":{"id":"1025"}},"fill_color":{"field":"color"},"line_color":{"value":"white"},"radius":{"value":0.4},"start_angle":{"expr":{"id":"1024"}},"x":{"value":0},"y":{"value":1}},"id":"1028","type":"Wedge"},{"attributes":{"coordinates":null,"data_source":{"id":"1026"},"glyph":{"id":"1028"},"group":null,"hover_glyph":null,"muted_glyph":{"id":"1030"},"nonselection_glyph":{"id":"1029"},"view":{"id":"1032"}},"id":"1031","type":"GlyphRenderer"},{"attributes":{"tools":[{"id":"1021"}]},"id":"1022","type":"Toolbar"},{"attributes":{"coordinates":null,"formatter":{"id":"1035"},"group":null,"major_label_policy":{"id":"1036"},"ticker":{"id":"1018"},"visible":false},"id":"1017","type":"LinearAxis"},{"attributes":{"end_angle":{"expr":{"id":"1025"}},"fill_alpha":{"value":0.1},"fill_color":{"field":"color"},"hatch_alpha":{"value":0.1},"line_alpha":{"value":0.1},"line_color":{"value":"white"},"radius":{"value":0.4},"start_angle":{"expr":{"id":"1024"}},"x":{"value":0},"y":{"value":1}},"id":"1029","type":"Wedge"},{"attributes":{"label":{"field":"country"},"renderers":[{"id":"1031"}]},"id":"1043","type":"LegendItem"},{"attributes":{"end_angle":{"expr":{"id":"1025"}},"fill_alpha":{"value":0.2},"fill_color":{"field":"color"},"hatch_alpha":{"value":0.2},"line_alpha":{"value":0.2},"line_color":{"value":"white"},"radius":{"value":0.4},"start_angle":{"expr":{"id":"1024"}},"x":{"value":0},"y":{"value":1}},"id":"1030","type":"Wedge"},{"attributes":{},"id":"1035","type":"BasicTickFormatter"},{"attributes":{"coordinates":null,"formatter":{"id":"1038"},"group":null,"major_label_policy":{"id":"1039"},"ticker":{"id":"1014"},"visible":false},"id":"1013","type":"LinearAxis"},{"attributes":{"data":{"angle":{"__ndarray__":"eQLEMwAC9z+3V8R09kHrP+QcmNXVFeo/hZ74ygF34j8vDs2tzcrZP1vToA6tntg/iJh0b4xy1z93BYbhOoTUPzmtw/IJwtI/0I8to/kr0j/Qjy2j+SvSP/xUAQTZ/9A/","dtype":"float64","order":"little","shape":[12]},"color":["#3182bd","#6baed6","#9ecae1","#c6dbef","#e6550d","#fd8d3c","#fdae6b","#fdd0a2","#31a354","#74c476","#a1d99b","#c7e9c0"],"country":["United States","United Kingdom","Japan","China","Germany","India","Italy","Australia","Brazil","France","Taiwan","Spain"],"index":[0,1,2,3,4,5,6,7,8,9,10,11],"value":[157,93,89,63,44,42,40,35,32,31,31,29]},"selected":{"id":"1041"},"selection_policy":{"id":"1040"}},"id":"1026","type":"ColumnDataSource"},{"attributes":{"axis":{"id":"1013"},"coordinates":null,"grid_line_color":null,"group":null,"ticker":null},"id":"1016","type":"Grid"},{"attributes":{"source":{"id":"1026"}},"id":"1032","type":"CDSView"},{"attributes":{"start":-0.5},"id":"1005","type":"Range1d"},{"attributes":{},"id":"1009","type":"LinearScale"},{"attributes":{"field":"angle"},"id":"1025","type":"CumSum"},{"attributes":{},"id":"1036","type":"AllLabels"},{"attributes":{},"id":"1011","type":"LinearScale"},{"attributes":{"coordinates":null,"group":null,"text":"Pie Chart of Top12 - country"},"id":"1003","type":"Title"},{"attributes":{"callback":null,"tooltips":[["country","@{country}"],["count","@{value}"]]},"id":"1021","type":"HoverTool"},{"attributes":{},"id":"1018","type":"BasicTicker"}],"root_ids":["1002"]},"title":"Bokeh Application","version":"2.4.2"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            const fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  const docs_json = document.getElementById('1161').textContent;
+                  const render_items = [{"docid":"c5c55203-0257-43f9-bdb1-ce0db76c9a3e","root_ids":["1002"],"roots":{"1002":"9bfc9596-8e29-4449-9e10-bb941de636c1"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    let attempts = 0;
+                    const timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        clearInterval(timer);
+                        embed_document(root);
+                      } else {
+                        attempts++;
+                        if (attempts > 100) {
+                          clearInterval(timer);
+                          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        }
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    
+  </body>
+  
+</html>

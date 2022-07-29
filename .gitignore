@@ -19,6 +19,9 @@ lib64/
 parts/
 sdist/
 var/
+test_interactive.html
+test_interactive.py
+utils/utils_plotting2.py
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
@@ -50,6 +53,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.vscode/
 
 # Translations
 *.mo
@@ -97,6 +101,7 @@ __pypackages__/
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
+CKAN.md
 
 # SageMath parsed files
 *.sage.py
@@ -106,6 +111,7 @@ celerybeat.pid
 .venv
 env/
 venv/
+diagrams/
 ENV/
 env.bak/
 venv.bak/
