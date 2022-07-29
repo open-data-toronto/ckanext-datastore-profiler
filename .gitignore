@@ -19,6 +19,9 @@ lib64/
 parts/
 sdist/
 var/
+test_interactive.html
+test_interactive.py
+utils/utils_plotting2.py
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
