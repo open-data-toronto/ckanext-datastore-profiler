@@ -97,3 +97,25 @@ pip install -r requirements.txt
 ```
 
 With the virtual environment active, any python scripts you run will have access to the needed modules in the correct versions
+
+
+## Interactive visualization of Profiler outputs
+This feature is hard-coded for POC v1.0. Change the `dtype` variable in **datastore_profiler.py** file and run the **datastore_profiler.py** to create interactive visual for specific datatype. 
+
+- [x] Numerics
+```py
+# Change dtype variables in datastore_profiler.py
+dtype = 'numerics'
+
+# Run the file to create interactive visual
+python datastore_profiler.py 
+```
+- [x] Datetimes 
+```py
+# Change dtype variables in datastore_profiler.py
+dtype = 'datetimes'
+
+# Run the file to create interactive visual
+python datastore_profiler.py 
+```
+- [x] Strings - NOT IMPLEMENTED YET
