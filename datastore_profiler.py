@@ -9,7 +9,7 @@ import pandas as pd
 from utils.numericstatistics import NumericStatistics
 from utils.datestatistics import DateStatistics
 from utils.stringstatistics import StringStatistics
-from utils.utils_plotting import plot_numeric_feature, plot_datasource_features, plot_pie_chart, plot_data_table, display_tables_in_tabs, display_strings_tables_for_ckan, plot_string_feature, plot_timeseries_feature
+from utils.utils_plotting import plot_datasource_features
 
 class Profiler:
     def __init__(self, package_name, ckanaddress, apikey ):
@@ -126,10 +126,17 @@ def visualize_datastore_resource(resource_id):
                 dict_strings[field_name] = field_profile          # append to dict_strings 
 
     # Display Stats as per MockUp
-    dtype = 'datetimes'
-    dict_features = dict_datetimes
+    dtype = 'numerics'
 
-    plot_datasource_features(dict_features, lshow=True, dtype='datetimes')
+    if (dtype == 'numerics'):
+        dict_features = dict_numerics
+    elif (dtype == 'datetimes'):
+        dict_features = dict_datetimes
+    elif (dtype == 'strings'): # NOT IMPLEMENTED
+        dict_features = dict_strings
+
+    # Call the plot function -> Returns html
+    plot_datasource_features(dict_features, lshow=True, dtype=dtype)
     print('>> Completed - HTMLs')
 
 
