@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 # Bokeh - io, plotting, and layout
-from bokeh.io import output_file, show, curdoc
+from bokeh.io import output_file, show, curdoc, save
 from bokeh.plotting import figure
 from bokeh.layouts import gridplot, row, column, layout
 
@@ -23,6 +23,8 @@ from bokeh.models.widgets import Tabs, Panel
 def plot_datasource_features(dict_features, lshow=True, dtype='numerics'):
     """Returns interactive html using bokeh     
     """
+    # Debugger flag (internal use)
+    ldebug = False
 
     # Convert dict to DF
     df_features = pd.DataFrame.from_dict(dict_features, orient="index").reset_index()    
@@ -40,7 +42,7 @@ def plot_datasource_features(dict_features, lshow=True, dtype='numerics'):
     # Create CDS using DataFrame
     source = ColumnDataSource(data=df_features)
     filtered_source = ColumnDataSource(data=df_feature)
-    print('Before filter:\n', filtered_source.data)
+    if (ldebug): print('Before filter:\n', filtered_source.data)
 
     if (dtype == 'numerics'):
         # Display for null_count & all_unique
@@ -145,7 +147,7 @@ def plot_datasource_features(dict_features, lshow=True, dtype='numerics'):
                         code=callback_code)
     selected_feature.js_on_change('value', callback)
 
-    print('After filtereed:\n', filtered_source.data)
+    if (ldebug): print('After filtereed:\n', filtered_source.data)
 
     # Layout of numeric key 
     if (dtype == 'numerics'):
@@ -161,4 +163,6 @@ def plot_datasource_features(dict_features, lshow=True, dtype='numerics'):
         show(layout_final)
     else:
         # Output visual will be saved as below
+        print(f">> HTML output is saved: html/mockup_datasourceid_{dtype}.html")
         output_file(f"html/mockup_datasourceid_{dtype}.html")
+        save(layout_final)

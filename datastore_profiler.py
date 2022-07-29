@@ -136,7 +136,7 @@ def visualize_datastore_resource(resource_id):
         dict_features = dict_strings
 
     # Call the plot function -> Returns html
-    plot_datasource_features(dict_features, lshow=True, dtype=dtype)
+    plot_datasource_features(dict_features, lshow=False, dtype=dtype)
     print('>> Completed - HTMLs')
 
 
