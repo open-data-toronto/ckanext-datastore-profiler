@@ -24,19 +24,29 @@ class StringStatistics:
 
 
         # if all strings are unique, label the data as such
+        all_unique = False
         if all( [value == 1 for value in output.values()] ):
-            output = {"all_unique": True}
+            all_unique = True
 
         # if all strings are numeric, label the data as such
+        all_numeric = False
         if all( [re.match(r'-?\d+\.?\d?', str(key)) for key in output.keys()] ):
-            output["all_numeric"] = True
+            all_numeric = True
         
         # add number of empty values to output
         if None in input:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
 
         #return output
-        return {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)}
+        return {
+            "lengths": {
+                "min_string_length": min( [len(str(string)) for string in output] ),
+                "max_string_length": max( [len(str(string)) for string in output] ),
+                },
+            "counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
+            "all_unique": all_unique,
+            "all_numeric": all_numeric,
+            }
 
 
     def mask_count(self, input):
@@ -59,8 +69,7 @@ class StringStatistics:
         if None in input:
             output["null_count"] = len(input) - len([x for x in input if x]) 
 
-        #return output
-        return {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)}
+        return {"counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)} }
 
     
     def word_count(self, input):
@@ -97,13 +106,14 @@ class StringStatistics:
 
 
         # return output sorted by count
-        return {
-                "word_counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
+        return { 
+            "words":
+            {
                 "min_word_count": min( [len(words.split(" ")) for words in working_data] ),
                 "max_word_count": max( [len(words.split(" ")) for words in working_data] ),
-                "min_string_length": min( [len(words) for words in working_data] ),
-                "max_string_length": max( [len(words) for words in working_data] )
+                "word_counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
             }
+        }
     
     def geometry_stats(self, input):
         geometry_types = list(set([ json.loads(object.replace('""', "'"))["type"] for object in input]))
@@ -117,22 +127,27 @@ class StringStatistics:
     def execute(self, input):
         # we want to differentiate normal text from geometries 
         # geometries are geojson objects with a "type" and "coordinates" key
+        output = {
+            "strings": {},
+            "words": {},
+            "masks": {},
+        }
+
         try:
-            
+            # return geometry analytics, if this is a geometry string
             for item in input[:10]:
                 parsed = json.loads( item.replace('""', "'"))
                 assert "type" in parsed.keys() and "coordinates" in parsed.keys(), "Missing geometry keys"
                     
-
             return self.geometry_stats(input)
 
         except Exception as e:
 
-            output = self.unique_count(input)
-            if output.get("all_unique", None) or output.get("all_numeric", None):
-    
-                return output
-            output["word_count"] = self.word_count(input)
-            output["mask_count"] = self.mask_count(input)
-            return output
+            output["strings"] = self.unique_count(input)
 
+            if output["strings"].get("all_unique", None) or output.get("all_numeric", None):
+                return output
+
+            output["words"] = self.word_count(input)
+            output["masks"] = self.mask_count(input)
+            return output

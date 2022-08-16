@@ -35,6 +35,9 @@ class NumericStatistics:
         # remove nulls from working data
         working_data = [float(number) for number in input if number and number == number]
 
+        if len(working_data) == 0:
+            return {"all_null": True}
+
         # calculate distinct counts that each number appears
         number_counts = Counter(working_data)
         
