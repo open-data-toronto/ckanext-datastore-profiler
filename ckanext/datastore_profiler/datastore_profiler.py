@@ -76,8 +76,11 @@ def update_profile(context, data_dict):
             
             field_data = df[fieldname].tolist()
 
+            if "info" not in fields_metadata[i].keys():
+                fields_metadata[i]["info"] = {}
+
             if fields_metadata[i]["type"] in ["int", "int4", "float8"]:
-                print("------- FLOAT")
+                print("------- NUMERIC")
                 fields_metadata[i]["info"]["profile"] = NumericStatistics().numeric_count(field_data)
             elif fields_metadata[i]["type"] in ["date", "timestamp"]:
                 print("------- TIMESTAMP")

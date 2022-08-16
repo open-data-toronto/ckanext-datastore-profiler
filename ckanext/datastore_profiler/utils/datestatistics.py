@@ -83,6 +83,9 @@ class DateStatistics:
         # remove nulls from working data
         working_data = [value for value in scanned_input["data"] if value]
 
+        if len(working_data) == 0:
+            return {"all_null": True}
+
         # calculate distinct counts for month + years in input dates
         yearmonth_count = Counter([ date.strftime("%Y-%B") for date in working_data ])
         year_count = Counter([ date.strftime("%Y")  for date in working_data ])
