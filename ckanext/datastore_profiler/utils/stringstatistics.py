@@ -107,7 +107,7 @@ class StringStatistics:
 
         # return output sorted by count
         return { 
-            "words":
+            "counts":
             {
                 "min_word_count": min( [len(words.split(" ")) for words in working_data] ),
                 "max_word_count": max( [len(words.split(" ")) for words in working_data] ),

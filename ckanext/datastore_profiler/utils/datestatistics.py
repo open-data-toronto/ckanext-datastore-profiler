@@ -39,8 +39,9 @@ class DateStatistics:
             outputs = []
             results = []
             try:
-                for value in [str(val).replace("/", "-") for val in input if str(val).replace("/", "-") not in [None, "", "nan"]]: # this list comp remove Null values from this
+                for value in [val for val in input if val not in [None, "", "nan"]]: # this list comp remove Null values from this
                     # clean each value
+                    value = str(value).replace("/", "-")
                     
                     output = datetime.strptime(value, format)
                     outputs.append( output )
