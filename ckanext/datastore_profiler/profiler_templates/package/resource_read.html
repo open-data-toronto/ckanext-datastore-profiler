@@ -1,1 +1,13 @@
-xxxxxx
+{% ckan_extends %}
+
+{% block resource_content %}
+
+{{ super() }}
+
+<div>
+    <p>Here is where we will put our profiler UI</p>
+    <p>{{ res.url }}</p>
+    {{ h.get_profile( res.id ) }}
+</div>
+
+{% endblock %}

@@ -5,6 +5,12 @@ from . import datastore_profiler
 class DatastoreProfilerPlugin(p.SingletonPlugin):
     p.implements(p.IActions)
 
+    def get_profile(self, id):
+        
+        # get profile information for all attributes except for _id
+        output = tk.get_action("datastore_search")(data_dict={"resource_id": id, "limit": 0})["fields"][1:]
+        return output
+
     # ==============================
     # IActions
     # ==============================
@@ -24,12 +30,12 @@ class DatastoreProfilerPlugin(p.SingletonPlugin):
     # This is what we use to make custom CKAN webpages
 
     p.implements(p.IConfigurer)
-    #p.implements(p.ITemplateHelpers)
+    p.implements(p.ITemplateHelpers)
 
     def update_config(self, config):
         tk.add_template_directory(config, 'profiler_templates')
 
-    #def get_helpers(self):
-    #    return {
-    #        "get_catalog": utils.get_catalog,
-    #    }
+    def get_helpers(self):
+        return {
+            "get_profile": self.get_profile,
+        }
