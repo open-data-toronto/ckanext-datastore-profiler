@@ -4,10 +4,176 @@
 
 {{ super() }}
 
+<!-- Bootstrap JS and CSS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js">
+</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js">
+</script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+
 <div>
     <p>Here is where we will put our profiler UI</p>
     <p>{{ res.url }}</p>
-    {{ h.get_profile( res.id ) }}
+    {% set fields = h.get_profile( res.id ) %}
+    
+
+    <div class = "row">
+        <div class = "col-sm-2">
+            {% for fieldname, fieldvalues in fields.items() %}
+            <button type="button" class="btn btn-primary btn-block profiler-button" name = "{{ fieldname }}">{{ fieldname }}</button>
+            {% endfor %}
+        </div>
+        <div class = "col-sm-10" id = "profiler-main">
+            <div class = "row">
+                <div class = "col-sm-12">
+                    <h3 style="text-align: center" id = "profiler-header">Column Name</h3>
+                </div>
+                <div class = "col-sm-12">
+                    <row id = "profiler-body-top"></row>
+                    <row id = "profiler-body-bottom"></row>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<script>
+
+    var btns = document.querySelectorAll('.profiler-button');
+    var main = document.getElementById('profiler-main');
+    var body_top = document.getElementById('profiler-body-top');
+    var body_bottom = document.getElementById('profiler-body-bottom');
+    var header = document.getElementById('profiler-header');
+    var fields = {{ fields | tojson | safe }}
+    console.log(fields)
+
+    // logic to create profile UI based on selected field
+    function profilerUI(input) {
+        console.log(input)
+
+        // clear html content
+        body_top.innerHTML = ""
+        body_bottom.innerHTML = ""
+
+        // if numeric input
+        if ( ["int4", "float8"].includes(input["type"])){
+            console.log("NUMERIC")
+
+            
+            var table = document.createElement('table')
+            console.log(table)
+            
+            // for each key, value pair, add a row to an html table
+            for ( const [key, value] of Object.entries(input["info"]["profile"])){
+                row = table.appendChild( document.createElement("tr") )
+                kitem = row.appendChild( document.createElement("td") )
+                vitem = row.appendChild( document.createElement("td") )
+                kitem.innerHTML = key
+                vitem.innerHTML = value
+            }
+            body_top.appendChild(table)
+
+        }
+
+        // if date input
+        if (["timestamp", "date"].includes(input["type"])){
+            console.log("DATE")
+            var table = document.createElement('table')
+            table.className = "col-sm-12"
+            console.log(table)
+            
+            // for each key, value pair, add a row to an html table
+            for ( const [key, value] of Object.entries(input["info"]["profile"])){
+                // put simple summary stats into a single table
+                if (!key.endsWith("_count") | key == "null_count"){
+                    row = table.appendChild( document.createElement("tr") )
+                    kitem = row.appendChild( document.createElement("td") )
+                    vitem = row.appendChild( document.createElement("td") )
+                    kitem.innerHTML = key
+                    vitem.innerHTML = value
+                }
+                else {
+                    var count_table = document.createElement('table')
+                    count_table.className = "col-sm-3"
+                    count_header = document.createElement("th")
+                    count_header.innerHTML = key
+                    count_table.appendChild( count_header )
+                    for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][key])){
+                        count_row = count_table.appendChild( document.createElement("tr") )
+                        count_kitem = count_row.appendChild( document.createElement("td") )
+                        count_vitem = count_row.appendChild( document.createElement("td") )
+                        count_kitem.innerHTML = subkey
+                        count_vitem.innerHTML = subvalue
+                    }
+                }
+                body_bottom.appendChild(count_table)
+            body_top.appendChild(table)
+
+            }
+        }
+
+        // if text input
+        if (["text"].includes(input["type"])){
+            console.log("TEXT")
+            var items = ["strings", "words", "masks"]
+
+            for(const item of items){
+                var column = document.createElement('div')
+                column.className = "col-sm-4"
+
+                var table = document.createElement('table')
+                console.log(table)
+                console.log(item)
+                console.log(input["info"]["profile"][item])
+
+                for ( const [key, value] of Object.entries(input["info"]["profile"][item])){
+
+                    if (!key.endsWith("_count") | key == "null_count"){
+                        row = table.appendChild( document.createElement("tr") )
+                        kitem = row.appendChild( document.createElement("td") )
+                        vitem = row.appendChild( document.createElement("td") )
+                        kitem.innerHTML = key
+                        vitem.innerHTML = value
+                    }
+                    else {
+                        var count_table = document.createElement('table')
+                        count_table.className = "col-sm-4"
+                        count_header = document.createElement("th")
+                        count_header.innerHTML = key
+                        count_table.appendChild( count_header )
+                        for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][item])){
+                            count_row = count_table.appendChild( document.createElement("tr") )
+                            count_kitem = count_row.appendChild( document.createElement("td") )
+                            count_vitem = count_row.appendChild( document.createElement("td") )
+                            count_kitem.innerHTML = subkey
+                            count_vitem.innerHTML = subvalue
+                            }   
+                        column.appendChild(count_table)
+                        
+                    }
+                    column.appendChild(table)
+                    body_bottom.appendChild(column)
+                }
+            }
+    }
+}
+
+    // Change profiler-main content on click
+    btns.forEach(el =>{
+        el.addEventListener('click', function handleClick() {
+            console.log(el.name)
+            field_metadata =  fields[el.name]
+            header.textContent = el.name + " - " + field_metadata["type"]
+
+            profilerUI(field_metadata)
+        });
+    });
+
+</script>
 
 {% endblock %}

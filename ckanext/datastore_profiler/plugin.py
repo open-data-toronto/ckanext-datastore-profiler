@@ -8,7 +8,9 @@ class DatastoreProfilerPlugin(p.SingletonPlugin):
     def get_profile(self, id):
         
         # get profile information for all attributes except for _id
-        output = tk.get_action("datastore_search")(data_dict={"resource_id": id, "limit": 0})["fields"][1:]
+        raw = tk.get_action("datastore_search")(data_dict={"resource_id": id, "limit": 0})["fields"][1:]
+        # turn the output into a dict, with each attribute name as a key and each value as the attribute metadata
+        output = {object["id"]:object for object in raw}
         return output
 
     # ==============================
