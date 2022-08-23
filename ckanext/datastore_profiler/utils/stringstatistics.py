@@ -38,11 +38,9 @@ class StringStatistics:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
 
         #return output
-        return {
-            "lengths": {
-                "min_string_length": min( [len(str(string)) for string in output] ),
-                "max_string_length": max( [len(str(string)) for string in output] ),
-                },
+        return {         
+            "min_string_length": min( [len(str(string)) for string in output] ),
+            "max_string_length": max( [len(str(string)) for string in output] ),
             "counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
             "all_unique": all_unique,
             "all_numeric": all_numeric,
@@ -92,7 +90,7 @@ class StringStatistics:
 
         # build list of unique strings, and of "words" to skip
         output = Counter(working_words)
-        words_to_skip = ["the", "this", "that", "a", "it"]
+        words_to_skip = ["the", "this", "that", "a", "it", "by", "of", "a", "at", "to", "and", "for"]
 
         # count how many times each string appears in input
         for word in words_to_skip:
@@ -106,13 +104,10 @@ class StringStatistics:
 
 
         # return output sorted by count
-        return { 
-            "counts":
-            {
+        return {     
                 "min_word_count": min( [len(words.split(" ")) for words in working_data] ),
                 "max_word_count": max( [len(words.split(" ")) for words in working_data] ),
                 "word_counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
-            }
         }
     
     def geometry_stats(self, input):

@@ -15,6 +15,27 @@
 <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 
+<style>
+    table {
+      border-collapse: collapse;
+      width: auto;
+      max-height: 200px;
+      display:block;
+      overflow-y: auto;
+      table-layout: fixed;
+  }
+
+    th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        position: sticky;
+    }
+
+    td, tr {
+      width: auto;
+    }
+</style>
+
 <div>
     <p>Here is where we will put our profiler UI</p>
     <p>{{ res.url }}</p>
@@ -123,45 +144,64 @@
             var items = ["strings", "words", "masks"]
 
             for(const item of items){
+                // for each of strings, words, and masks, give them a column to put their viz
                 var column = document.createElement('div')
                 column.className = "col-sm-4"
-
+                string_header = document.createElement("h4")
+                string_header.textContent = item
+                column.append(string_header)
+                
+                // init a table to put simple summary stats
                 var table = document.createElement('table')
+                table.id = "small-table"
                 console.log(table)
                 console.log(item)
                 console.log(input["info"]["profile"][item])
 
                 for ( const [key, value] of Object.entries(input["info"]["profile"][item])){
 
-                    if (!key.endsWith("_count") | key == "null_count"){
+                    // simple stats go into one table
+                    if ( !key.endsWith("_counts") & key != "counts"){
+                        console.log("MINI TABLE: " + key)
                         row = table.appendChild( document.createElement("tr") )
                         kitem = row.appendChild( document.createElement("td") )
                         vitem = row.appendChild( document.createElement("td") )
                         kitem.innerHTML = key
                         vitem.innerHTML = value
-                    }
-                    else {
+                    };
+
+                    // complex counts stats , with many values, get their own "count_table"
+                    if ( ["counts", "word_counts"].includes( key ) ) {
+                        console.log("BIG TABLE: " + key)
                         var count_table = document.createElement('table')
-                        count_table.className = "col-sm-4"
+                        count_table.id = "big-table"
                         count_header = document.createElement("th")
                         count_header.innerHTML = key
                         count_table.appendChild( count_header )
-                        for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][item])){
+                        for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][item][key])){
                             count_row = count_table.appendChild( document.createElement("tr") )
                             count_kitem = count_row.appendChild( document.createElement("td") )
                             count_vitem = count_row.appendChild( document.createElement("td") )
                             count_kitem.innerHTML = subkey
                             count_vitem.innerHTML = subvalue
-                            }   
-                        column.appendChild(count_table)
+                        }   
                         
                     }
-                    column.appendChild(table)
-                    body_bottom.appendChild(column)
+                    //column.appendChild(table)
                 }
+                    
+                
+                column.appendChild(table)
+                column.appendChild(count_table)
+                body_bottom.appendChild(column)
             }
+        }
+        // Data table bootstrap sorting method
+        $('#big-table').DataTable({
+            "paging": false,
+        });
     }
-}
+
 
     // Change profiler-main content on click
     btns.forEach(el =>{
@@ -173,6 +213,8 @@
             profilerUI(field_metadata)
         });
     });
+
+
 
 </script>
 
