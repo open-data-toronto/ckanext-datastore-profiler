@@ -23,17 +23,30 @@
       display:block;
       overflow-y: auto;
       table-layout: fixed;
+      position: relative;
+      margin-top: 30px;
   }
 
     th {
-        padding-top: 12px;
-        padding-bottom: 12px;
         position: sticky;
+        background-color: #ffffff;
+        top: 0;
     }
 
     td, tr {
       width: auto;
+      border: 1px solid #dddddd;
+      padding: 16px 
     }
+
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+
+    td:nth-child(odd) {
+      font-weight: bold;
+    }
+    
 </style>
 
 <div>
@@ -122,6 +135,7 @@
                     var count_table = document.createElement('table')
                     count_table.className = "col-sm-3"
                     count_header = document.createElement("th")
+                    count_header.colSpan = "2"
                     count_header.innerHTML = key
                     count_table.appendChild( count_header )
                     for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][key])){
@@ -176,6 +190,7 @@
                         var count_table = document.createElement('table')
                         count_table.id = "big-table"
                         count_header = document.createElement("th")
+                        count_header.colSpan = "2"
                         count_header.innerHTML = key
                         count_table.appendChild( count_header )
                         for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][item][key])){
@@ -196,10 +211,6 @@
                 body_bottom.appendChild(column)
             }
         }
-        // Data table bootstrap sorting method
-        $('#big-table').DataTable({
-            "paging": false,
-        });
     }
 
 
