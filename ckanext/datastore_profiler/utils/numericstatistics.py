@@ -29,11 +29,12 @@ class NumericStatistics:
 
 
         # make sure all inputs can be converted to float
+        input = [None if item == "None" else item for item in input]
         # number == number notation is to check for NaNs, since NaN does not equal itself
-        assert all(isinstance(float(x), float) for x in input if x and x == x), "Input to min_max_med() must be all int, float or null"
+        assert all(isinstance(float(x), float) for x in input if x and x == x), "Input to numeric profiler must be all int, float or null"
         
         # remove nulls from working data
-        working_data = [float(number) for number in input if number and number == number]
+        working_data = [float(number) for number in input if number and number == number and number]
 
         if len(working_data) == 0:
             return {"all_null": True}

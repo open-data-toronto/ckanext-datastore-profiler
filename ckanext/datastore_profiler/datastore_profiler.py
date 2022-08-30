@@ -3,8 +3,8 @@ from fileinput import filename
 from pydoc import source_synopsis
 import requests
 import json
-import pandas as pd
 import io
+import re
 
 from .utils.numericstatistics import NumericStatistics
 from .utils.datestatistics import DateStatistics
@@ -52,8 +52,6 @@ def update_profile(context, data_dict):
         datastore_resource_summary =  tk.get_action("datastore_search")(context, {"limit":0, "id": resource_id})
         resource_metadata[ resource_id ] = datastore_resource_summary["fields"]
 
-    
-
     ### CREATE PROFILE INPUT RESOURCES IN MEMORY
 
     for resource_id in resource_metadata.keys():
@@ -63,7 +61,13 @@ def update_profile(context, data_dict):
         # dump data into pandas dataframe
         env = tk.config.get("ckan.site_url")
         dump = env + "/datastore/dump/" + resource_id
-        df = pd.read_csv( dump )
+        #df = pd.read_csv( dump )
+        data = []
+        raw = requests.get(dump, stream=True)
+        print(type(raw))
+        for line in raw.iter_lines():
+            data.append(line)
+        data = data[1:]
         
         # for each field, add appropriate profile to the metadata aobject
         for i in range(len(fields_metadata)):
@@ -71,22 +75,21 @@ def update_profile(context, data_dict):
             if fieldname == "_id": # we dont want to touch '_id' - we remove it later in this method
                 continue
 
-            print("================================ FIELD:")
-            print(fieldname)
-            
-            field_data = df[fieldname].tolist()
+            # just get the data in this field
+            field_data = [row.decode('UTF-8').split(",")[i] for row in data]
+            print("--------------------------- " + fieldname)
+            print(field_data[:10])
+
+            #field_data = df[fieldname].tolist()
 
             if "info" not in fields_metadata[i].keys():
                 fields_metadata[i]["info"] = {}
 
             if fields_metadata[i]["type"] in ["int", "int4", "float8"]:
-                print("------- NUMERIC")
                 fields_metadata[i]["info"]["profile"] = NumericStatistics().numeric_count(field_data)
             elif fields_metadata[i]["type"] in ["date", "timestamp"]:
-                print("------- TIMESTAMP")
                 fields_metadata[i]["info"]["profile"] = DateStatistics().date_count(field_data)
             else:
-                print("------- STRING")
                 fields_metadata[i]["info"]["profile"] = StringStatistics().execute(field_data)
 
         # get rid of _id column - CKAN doesnt allow us to insert columns with that name
