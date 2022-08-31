@@ -62,10 +62,8 @@ def update_profile(context, data_dict):
         # dump data into memory
         env = tk.config.get("ckan.site_url")
         dump = env + "/datastore/dump/" + resource_id
-        #df = pd.read_csv( dump )
         data = []
         raw = requests.get(dump, stream=True)
-        print(type(raw))
         for line in raw.iter_lines():
             line = list(csv.reader(io.StringIO(line.decode("utf-8")), delimiter=","))
             data += line
