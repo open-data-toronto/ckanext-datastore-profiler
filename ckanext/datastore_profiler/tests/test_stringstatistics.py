@@ -37,7 +37,7 @@ def test_unique_word_counts_from_list():
     """
 
     # get stats from appropriate class
-    dict_stats = StringStatistics().word_count(test_data)["counts"]["word_counts"]
+    dict_stats = StringStatistics().word_count(test_data)["word_counts"]
 
     # set the expected results
     correct_stats = {'val2': 3, 'val-3': 2, 'val3': 2, 'val1': 2, 'is': 2, 'Value Empty/Null': 2, 'ccc-9': 1, 'd-1': 1, 'val4': 1}
@@ -52,7 +52,7 @@ def test_word_stats_from_list():
     """
 
     # get stats from appropriate class
-    dict_stats = StringStatistics().word_count(test_data)["counts"]
+    dict_stats = StringStatistics().word_count(test_data)
 
     # set the expected results
     correct_stats = {'min_word_count': 1, 'max_word_count': 3, 'min_string_length': 3, 'max_string_length': 14}

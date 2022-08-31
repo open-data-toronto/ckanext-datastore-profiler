@@ -4,6 +4,7 @@ from pydoc import source_synopsis
 import requests
 import json
 import io
+import csv
 import re
 
 from .utils.numericstatistics import NumericStatistics
@@ -58,7 +59,7 @@ def update_profile(context, data_dict):
         # for each resource
         fields_metadata = resource_metadata[resource_id]
         
-        # dump data into pandas dataframe
+        # dump data into memory
         env = tk.config.get("ckan.site_url")
         dump = env + "/datastore/dump/" + resource_id
         #df = pd.read_csv( dump )
@@ -66,8 +67,12 @@ def update_profile(context, data_dict):
         raw = requests.get(dump, stream=True)
         print(type(raw))
         for line in raw.iter_lines():
-            data.append(line)
+            line = list(csv.reader(io.StringIO(line.decode("utf-8")), delimiter=","))
+            data += line
+
         data = data[1:]
+
+
         
         # for each field, add appropriate profile to the metadata aobject
         for i in range(len(fields_metadata)):
@@ -76,11 +81,7 @@ def update_profile(context, data_dict):
                 continue
 
             # just get the data in this field
-            field_data = [row.decode('UTF-8').split(",")[i] for row in data]
-            print("--------------------------- " + fieldname)
-            print(field_data[:10])
-
-            #field_data = df[fieldname].tolist()
+            field_data = [row[i] for row in data]
 
             if "info" not in fields_metadata[i].keys():
                 fields_metadata[i]["info"] = {}
