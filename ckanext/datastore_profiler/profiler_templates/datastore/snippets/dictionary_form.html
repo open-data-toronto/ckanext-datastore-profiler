@@ -1,0 +1,39 @@
+{% import 'macros/form.html' as form %}
+
+<h3>{{ _( "Field {num}.").format(num=position) }} {{ field.id }} ({{ field.type }})</h3>
+
+{#
+  Data Dictionary fields may be added this snippet. New fields following
+  the 'info__' ~ position ~ '__namegoeshere' convention will be saved
+  as part of the "info" object on the column.
+#}
+
+{{ form.select('info__' ~ position ~ '__type_override',
+  label=_('Type Override'), options=[
+  {'name': '', 'value': ''},
+  {'name': 'text', 'value': 'text'},
+  {'name': 'numeric', 'value': 'numeric'},
+  {'name': 'timestamp', 'value': 'timestamp'},
+  ], selected=field.get('info', {}).get('type_override', '')) }}
+
+{{ form.input('info__' ~ position ~ '__label',
+  label=_('Label'), id='field-f' ~ position ~ 'label',
+  value=field.get('info', {}).get('label', ''), classes=['control-full']) }}
+
+{{ form.markdown('info__' ~ position ~ '__notes',
+  label=_('Description'), id='field-d' ~ position ~ 'notes',
+  value=field.get('info', {}).get('notes', '')) }}
+
+{{ form.input('info__' ~ position ~ '__tags',
+  label=_('Tags'), id='field-d' ~ position ~ 'tags',
+  value=field.get('info', {}).get('tags', '')) }}
+
+{# 
+    Hidden input below contains datastore profile
+    this ensures that saving the resource through this page 
+    doesnt overwrite, and therefore delete, the profile 
+#}
+
+{{ form.hidden_dict('info__' ~ position ~ '__profile',
+  value=field.get('info', {}).get('profile', '')) }}
+
