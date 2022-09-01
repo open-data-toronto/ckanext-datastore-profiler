@@ -34,6 +34,6 @@
     doesnt overwrite, and therefore delete, the profile 
 #}
 
-{{ form.hidden_dict('info__' ~ position ~ '__profile',
+{{ form.hidden('info__' ~ position ~ '__profile',
   value=field.get('info', {}).get('profile', '')) }}
 

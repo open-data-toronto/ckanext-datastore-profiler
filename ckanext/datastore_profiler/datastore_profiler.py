@@ -84,12 +84,13 @@ def update_profile(context, data_dict):
             if "info" not in fields_metadata[i].keys():
                 fields_metadata[i]["info"] = {}
 
+            # profiles are stored as stringified json objects
             if fields_metadata[i]["type"] in ["int", "int4", "float8"]:
-                fields_metadata[i]["info"]["profile"] = NumericStatistics().numeric_count(field_data)
+                fields_metadata[i]["info"]["profile"] = json.dumps( NumericStatistics().numeric_count(field_data) )
             elif fields_metadata[i]["type"] in ["date", "timestamp"]:
-                fields_metadata[i]["info"]["profile"] = DateStatistics().date_count(field_data)
+                fields_metadata[i]["info"]["profile"] = json.dumps( DateStatistics().date_count(field_data) )
             else:
-                fields_metadata[i]["info"]["profile"] = StringStatistics().execute(field_data)
+                fields_metadata[i]["info"]["profile"] = json.dumps( StringStatistics().execute(field_data) )
 
         # get rid of _id column - CKAN doesnt allow us to insert columns with that name
         for i in range(len(fields_metadata)):

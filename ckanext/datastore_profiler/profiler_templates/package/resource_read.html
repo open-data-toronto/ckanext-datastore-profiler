@@ -104,7 +104,6 @@
         if ( ["int4", "float8"].includes(input["type"])){
             
             var table = document.createElement('table')
-            console.log(table)
             
             // for each key, value pair, add a row to an html table
             for ( const [key, value] of Object.entries(input["info"]["profile"])){
@@ -125,6 +124,11 @@
             
             // for each key, value pair, add a row to an html table
             for ( const [key, value] of Object.entries(input["info"]["profile"])){
+                // if a key's value is null, skip it
+                if (value == null){
+                    continue
+                }
+
                 // put simple summary stats into a single table
                 if (!key.endsWith("_count") | key == "null_count"){
                     row = table.appendChild( document.createElement("tr") )
@@ -140,6 +144,8 @@
                     count_header.colSpan = "2"
                     count_header.innerHTML = key
                     count_table.appendChild( count_header )
+                    console.log( input["info"]["profile"][key] )
+                    console.log( key )
                     for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][key]).sort(([,a],[,b]) => b-a)){
                         count_row = count_table.appendChild( document.createElement("tr") )
                         count_kitem = count_row.appendChild( document.createElement("td") )
@@ -147,8 +153,9 @@
                         count_kitem.innerHTML = subkey
                         count_vitem.innerHTML = subvalue
                     }
+                    body_bottom.appendChild(count_table)
                 }
-                body_bottom.appendChild(count_table)
+                
             body_top.appendChild(table)
 
             }
