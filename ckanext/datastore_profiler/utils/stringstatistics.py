@@ -3,11 +3,12 @@
 # Import python libraries
 import re
 import json
+from collections import Counter
 
 class StringStatistics:
     """
         This class is a Collection of methods that compute statistics for strings 
-    """
+    """        
 
     def unique_count(self, input):
         """
@@ -18,30 +19,32 @@ class StringStatistics:
             output (dict): output dict - each key is a string from the input, and the number of times it appears as the value                           
         """
 
-        # init output
-        output = {}
+        # count how many times each string appears in input    
+        output = Counter(input)
 
-        # build list of unique strings
-        unique_values = list(set(input))
-
-        # count how many times each string appears in input
-        for unique_value in unique_values:
-            output[unique_value] = len( [item for item in input if item == unique_value] )
 
         # if all strings are unique, label the data as such
+        all_unique = False
         if all( [value == 1 for value in output.values()] ):
-            output = {"all_unique": True}
+            all_unique = True
 
         # if all strings are numeric, label the data as such
+        all_numeric = False
         if all( [re.match(r'-?\d+\.?\d?', str(key)) for key in output.keys()] ):
-            output["all_numeric"] = True
+            all_numeric = True
         
         # add number of empty values to output
         if None in input:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
 
         #return output
-        return {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)}
+        return {         
+            "min_string_length": min( [len(str(string)) for string in output] ),
+            "max_string_length": max( [len(str(string)) for string in output] ),
+            "counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
+            "all_unique": all_unique,
+            "all_numeric": all_numeric,
+            }
 
 
     def mask_count(self, input):
@@ -56,22 +59,15 @@ class StringStatistics:
         # init output
         output = {}
 
-        # for each string
-        for string in [str(x) for x in input if x]:
-            pattern = re.sub( '[a-zA-Z]', "L", string )
-            pattern = re.sub( '[0-9]', "D", pattern )
-
-            if pattern in output.keys():
-                output[ pattern ] += 1
-            else:
-                output[ pattern ] = 1
+        # for each string, create masks by replacing letters with "L" and digits with "D", then count each mask
+        masks = [ re.sub('[0-9]', "D", re.sub('[a-zA-Z]', "L", str(x))) for x in input if x ]
+        output = Counter(masks)
         
         # add number of empty values to output
         if None in input:
             output["null_count"] = len(input) - len([x for x in input if x]) 
 
-        #return output
-        return {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)}
+        return {"counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)} }
 
     
     def word_count(self, input):
@@ -91,30 +87,31 @@ class StringStatistics:
         # split each string by spaces, and make sure all the resulting "words" are in a single list
         working_words = " ".join(working_data).split(" ")
 
+
         # build list of unique strings, and of "words" to skip
-        unique_values = list(set(working_words))
-        words_to_skip = ["the", "this", "that", "a", "it"]
+        output = Counter(working_words)
+        words_to_skip = ["the", "this", "that", "a", "it", "by", "of", "a", "at", "to", "and", "for"]
 
         # count how many times each string appears in input
-        for unique_value in unique_values:
-            if unique_value not in words_to_skip:
-                output[unique_value] = len( [item for item in working_words if item == unique_value] )
+        for word in words_to_skip:
+            if word in output.keys():
+                output.pop( word )
+
         
         # add number of empty values to output
         if None in input:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x]) 
 
+
         # return output sorted by count
-        return {
-                "word_counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
+        return {     
                 "min_word_count": min( [len(words.split(" ")) for words in working_data] ),
                 "max_word_count": max( [len(words.split(" ")) for words in working_data] ),
-                "min_string_length": min( [len(words) for words in working_data] ),
-                "max_string_length": max( [len(words) for words in working_data] )
-            }
+                "word_counts": {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)},
+        }
     
     def geometry_stats(self, input):
-        geometry_types = set([object["type"] for object in input])
+        geometry_types = list(set([ json.loads(object.replace('""', "'"))["type"] for object in input]))
 
         return {
             "geometry_types": geometry_types,
@@ -125,19 +122,27 @@ class StringStatistics:
     def execute(self, input):
         # we want to differentiate normal text from geometries 
         # geometries are geojson objects with a "type" and "coordinates" key
+        output = {
+            "strings": {},
+            "words": {},
+            "masks": {},
+        }
+
         try:
-            
-            for item in input:
+            # return geometry analytics, if this is a geometry string
+            for item in input[:10]:
                 parsed = json.loads( item.replace('""', "'"))
                 assert "type" in parsed.keys() and "coordinates" in parsed.keys(), "Missing geometry keys"
                     
-            print("Geometry column identified")
             return self.geometry_stats(input)
 
         except Exception as e:
 
-            output = self.word_count(input)
-            output["unique_count"] = self.unique_count(input)
-            output["mask_count"] = self.mask_count(input)
-            return output
+            output["strings"] = self.unique_count(input)
 
+            if output["strings"].get("all_unique", None) or output.get("all_numeric", None):
+                return output
+
+            output["words"] = self.word_count(input)
+            output["masks"] = self.mask_count(input)
+            return output

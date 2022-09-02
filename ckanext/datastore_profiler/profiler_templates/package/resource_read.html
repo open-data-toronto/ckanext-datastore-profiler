@@ -1,0 +1,235 @@
+{% ckan_extends %}
+
+{% block resource_content %}
+
+{{ super() }}
+
+<!-- Bootstrap JS and CSS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js">
+</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js">
+</script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+
+<style>
+    table {
+      border-collapse: collapse;
+      width: auto;
+      max-height: 200px;
+      display: block;
+      overflow-y: auto;
+      table-layout: fixed;
+      position: relative;
+      margin-top: 30px;
+  }
+
+    th {
+        
+        position: sticky;
+        background-color: white;
+        top: 0;
+        font-weight: bold;
+    }
+
+    td, tr {
+      width: auto;
+      border: 1px solid #dddddd;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      padding-left: 8px;
+      padding-right: 8px; 
+    }
+
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+
+    td:nth-child(odd) {
+      font-weight: bold;
+    }
+
+    
+</style>
+
+<div>
+    <p>Here is where we will put our profiler UI</p>
+    <p>{{ res.url }}</p>
+    {% set fields = h.get_profile( res.id ) %}
+    
+
+    <div class = "row">
+        <div class = "col-sm-2">
+            {% for fieldname, fieldvalues in fields.items() %}
+            <button type="button" class="btn btn-primary btn-block profiler-button" name = "{{ fieldname }}">{{ fieldname }}</button>
+            {% endfor %}
+        </div>
+        <div class = "col-sm-10" id = "profiler-main">
+            <div class = "row">
+                <div class = "col-sm-12">
+                    <h3 style="text-align: center" id = "profiler-header">Column Name</h3>
+                </div>
+                <div class = "col-sm-12">
+                    <row id = "profiler-body-top"></row>
+                    <row id = "profiler-body-bottom"></row>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    var btns = document.querySelectorAll('.profiler-button');
+    var main = document.getElementById('profiler-main');
+    var body_top = document.getElementById('profiler-body-top');
+    var body_bottom = document.getElementById('profiler-body-bottom');
+    var header = document.getElementById('profiler-header');
+    var fields = {{ fields | tojson | safe }}
+    console.log(fields)
+
+    // logic to create profile UI based on selected field
+    function profilerUI(input) {
+        console.log(input)
+
+        // clear html content
+        body_top.innerHTML = ""
+        body_bottom.innerHTML = ""
+
+        // if numeric input
+        if ( ["int4", "float8"].includes(input["type"])){
+            
+            var table = document.createElement('table')
+            
+            // for each key, value pair, add a row to an html table
+            for ( const [key, value] of Object.entries(input["info"]["profile"])){
+                row = table.appendChild( document.createElement("tr") )
+                kitem = row.appendChild( document.createElement("td") )
+                vitem = row.appendChild( document.createElement("td") )
+                kitem.innerHTML = key
+                vitem.innerHTML = value
+            }
+            body_top.appendChild(table)
+
+        }
+
+        // if date input
+        if (["timestamp", "date"].includes(input["type"])){
+            var table = document.createElement('table')
+            table.className = "col-sm-12"
+            
+            // for each key, value pair, add a row to an html table
+            for ( const [key, value] of Object.entries(input["info"]["profile"])){
+                // if a key's value is null, skip it
+                if (value == null){
+                    continue
+                }
+
+                // put simple summary stats into a single table
+                if (!key.endsWith("_count") | key == "null_count"){
+                    row = table.appendChild( document.createElement("tr") )
+                    kitem = row.appendChild( document.createElement("td") )
+                    vitem = row.appendChild( document.createElement("td") )
+                    kitem.innerHTML = key
+                    vitem.innerHTML = value
+                }
+                else {
+                    var count_table = document.createElement('table')
+                    count_table.className = "col-sm-3"
+                    count_header = document.createElement("th")
+                    count_header.colSpan = "2"
+                    count_header.innerHTML = key
+                    count_table.appendChild( count_header )
+                    console.log( input["info"]["profile"][key] )
+                    console.log( key )
+                    for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][key]).sort(([,a],[,b]) => b-a)){
+                        count_row = count_table.appendChild( document.createElement("tr") )
+                        count_kitem = count_row.appendChild( document.createElement("td") )
+                        count_vitem = count_row.appendChild( document.createElement("td") )
+                        count_kitem.innerHTML = subkey
+                        count_vitem.innerHTML = subvalue
+                    }
+                    body_bottom.appendChild(count_table)
+                }
+                
+            body_top.appendChild(table)
+
+            }
+        }
+
+        // if text input
+        if (["text"].includes(input["type"])){
+            var items = ["strings", "words", "masks"]
+
+            for(const item of items){
+                // for each of strings, words, and masks, give them a column to put their viz
+                var column = document.createElement('div')
+                column.className = "col-sm-4"
+                string_header = document.createElement("h4")
+                string_header.textContent = item
+                column.append(string_header)
+                
+                // init a table to put simple summary stats
+                var table = document.createElement('table')
+                table.id = "small-table"
+
+                for ( const [key, value] of Object.entries(input["info"]["profile"][item])){
+
+                    // simple stats go into one table
+                    if ( !key.endsWith("_counts") & key != "counts"){
+                        row = table.appendChild( document.createElement("tr") )
+                        kitem = row.appendChild( document.createElement("td") )
+                        vitem = row.appendChild( document.createElement("td") )
+                        kitem.innerHTML = key
+                        vitem.innerHTML = value
+                    };
+
+                    // complex counts stats , with many values, get their own "count_table"
+                    if ( ["counts", "word_counts"].includes( key ) ) {
+                        var count_table = document.createElement('table')
+                        count_table.id = "big-table"
+                        count_header = document.createElement("th")
+                        count_header.colSpan = "2"
+                        count_header.innerHTML = key
+                        count_table.appendChild( count_header )
+                        for ( const [subkey, subvalue] of Object.entries(input["info"]["profile"][item][key]).sort(([,a],[,b]) => b-a)){
+                            count_row = count_table.appendChild( document.createElement("tr") )
+                            count_kitem = count_row.appendChild( document.createElement("td") )
+                            count_vitem = count_row.appendChild( document.createElement("td") )
+                            count_kitem.innerHTML = subkey
+                            count_vitem.innerHTML = subvalue
+                        }   
+                        
+                    }
+                    //column.appendChild(table)
+                }
+                    
+                if (table.innerHTML != ""){
+                    column.appendChild(table)
+                }
+
+                column.appendChild(count_table)
+                body_bottom.appendChild(column)
+            }
+        }
+    }
+
+    // Change profiler-main content on click
+    btns.forEach(el =>{
+        el.addEventListener('click', function handleClick() {
+            field_metadata =  fields[el.name]
+            header.textContent = el.name + " - " + field_metadata["type"]
+
+            profilerUI(field_metadata)
+        });
+    });
+
+
+
+</script>
+
+{% endblock %}
