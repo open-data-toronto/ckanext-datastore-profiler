@@ -5,7 +5,6 @@ from . import datastore_profiler
 import json
 
 class DatastoreProfilerPlugin(p.SingletonPlugin):
-    p.implements(p.IActions)
 
     def get_profile(self, id):
         
@@ -27,7 +26,8 @@ class DatastoreProfilerPlugin(p.SingletonPlugin):
     # These are custom api endpoints
     # ex: hitting <ckan_url>/api/action/extract_info will trigger the api.extract_info function
     # These can also be used with tk.get_action("extract_info"), for example, in this CKAN extension code
-
+    p.implements(p.IActions)
+    
     def get_actions(self):
         return {
             "update_profile": datastore_profiler.update_profile,
