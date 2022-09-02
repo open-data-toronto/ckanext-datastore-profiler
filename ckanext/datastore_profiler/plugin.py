@@ -7,7 +7,6 @@ import json
 class DatastoreProfilerPlugin(p.SingletonPlugin):
 
     def get_profile(self, id):
-        
         # get profile information for all attributes except for _id
         raw = tk.get_action("datastore_search")(data_dict={"resource_id": id, "limit": 0})["fields"][1:]
 
@@ -20,6 +19,8 @@ class DatastoreProfilerPlugin(p.SingletonPlugin):
         output = {object["id"]:object for object in raw}
         return output
 
+    
+
     # ==============================
     # IActions
     # ==============================
@@ -27,10 +28,11 @@ class DatastoreProfilerPlugin(p.SingletonPlugin):
     # ex: hitting <ckan_url>/api/action/extract_info will trigger the api.extract_info function
     # These can also be used with tk.get_action("extract_info"), for example, in this CKAN extension code
     p.implements(p.IActions)
-    
+
     def get_actions(self):
         return {
             "update_profile": datastore_profiler.update_profile,
+            "datastore_create": datastore_profiler.datastore_create_hook,
         }
 
     # ==============================

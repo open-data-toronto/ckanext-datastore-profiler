@@ -103,3 +103,28 @@ def update_profile(context, data_dict):
         
         # write edited resource metadata into ckan
         result = tk.get_action("datastore_create")(context, {"resource_id": resource_id, "fields": fields_metadata, "force":True})
+
+@tk.chained_action
+def datastore_create_hook(original_datastore_create, context, data_dict):
+    # triggers when datastore_create is called
+    # it ensures that any tags on a newly updated datastore resource's attributes are 
+    # also pushed to that resource's package's 'tags' object
+
+    # make sure an authorized user is making this call
+    print("------------ Checking Auth")
+    tk.check_access("datastore_create", context, data_dict)
+    assert context["auth_user_obj"], "This endpoint can be used by authorized accounts only"
+    print("------------ Done Checking Auth")
+    
+    # add resource tags with package tags
+    print(" ------------------------------------------------------- data_dict")
+    print(data_dict.keys())
+
+    for field in data_dict["fields"]:
+        print(field["info"].get("tags", None))
+
+    # TODO
+    # add the tags gathered from above to a package_patch call, and add them to the `tags` object therein
+
+    # run original datastore_create
+    return original_datastore_create(context, data_dict)
