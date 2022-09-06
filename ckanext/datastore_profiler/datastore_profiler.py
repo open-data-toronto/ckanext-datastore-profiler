@@ -118,10 +118,42 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
     
     # add resource tags with package tags
     print(" ------------------------------------------------------- data_dict")
-    print(data_dict.keys())
+
+
+    # collect resource attributes' tags
+    tags = []
 
     for field in data_dict["fields"]:
         print(field["info"].get("tags", None))
+        if field["info"].get("tags", None):
+            tags.append(field["info"]["tags"])
+
+    # make sure there is a vocabulary for attribute tags
+    vocabulary = [vocabulary for vocabulary in tk.get_action("vocabulary_list")(context) if vocabulary["name"] == "attribute_tags"]
+    # if attribute_tags isnt a vocabulary, make it and grab its ID
+    if not vocabulary:
+        vocabulary = tk.get_action("vocabulary_create")(context, {"name": "attribute_tags"})
+
+    # if its a new tag, add the tag
+    for tag in tags:
+        if tag not in [tag["name"] for tag in vocabulary["tags"]]:
+            # add tag and its association to attribute_tags vocabulary to CKAN
+            tag_object = tk.get_action("tag_create")(context, {"name": tag, "vocabulary_id": vocabulary["id"]})
+
+            # add tag to package
+            # TODO - find package_id and add package to it
+
+    
+
+#    for tag in tags:
+#        vocabulary_list = tk.get_action("vocabulary_list")(context)
+#        for vocabulary in vocabulary_list:
+#            if vocabulary["name"] == "attribute_tags":
+#                vocabulary_id = vocabulary["id"]
+        
+        
+
+    
 
     # TODO
     # add the tags gathered from above to a package_patch call, and add them to the `tags` object therein
