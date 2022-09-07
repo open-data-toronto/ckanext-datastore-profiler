@@ -115,14 +115,12 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
     tk.check_access("datastore_create", context, data_dict)
     assert context["auth_user_obj"], "This endpoint can be used by authorized accounts only"
     print("------------ Done Checking Auth")
+
+    # run original datastore_create - we'll need its output to get package information
+    datastore_create_output = original_datastore_create(context, data_dict)
     
-    # add resource tags with package tags
-    print(" ------------------------------------------------------- data_dict")
-
-
     # collect resource attributes' tags
     tags = []
-
     for field in data_dict["fields"]:
         print(field["info"].get("tags", None))
         if field["info"].get("tags", None):
@@ -133,30 +131,33 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
     # if attribute_tags isnt a vocabulary, make it and grab its ID
     if not vocabulary:
         vocabulary = tk.get_action("vocabulary_create")(context, {"name": "attribute_tags"})
+    # if the vocabulary exists, unpack it from its enveloping array
+    else:
+        vocabulary = vocabulary[0]
+
+    # get package info
+    resource = tk.get_action("resource_show")(context, {"id": datastore_create_output["resource_id"]} )
+    package = tk.get_action("package_show")(context, {"id": resource["package_id"]} )
+    package_tags = [tag for tag in package["tags"] if tag["vocabulary_id"] == None ]
+
+
+    # compile tags from each datastore resource that is NOT this datastore resource
+    for resource in [ r for r in package["resources"] if r.get("datastore_active", None) in [True, "true", "True"] and r["id"] != datastore_create_output["resource_id"] ]:
+        datastore_resource = tk.get_action("datastore_search")(context, {"id": resource["id"], "limit": 0})
+        if field["info"].get("tags", None):
+            print("Appending {} to tags".format(field["info"]["tags"]) )
+            tags.append( field["info"]["tags"] )
 
     # if its a new tag, add the tag
     for tag in tags:
+        # add tag and its association to attribute_tags vocabulary to CKAN
         if tag not in [tag["name"] for tag in vocabulary["tags"]]:
-            # add tag and its association to attribute_tags vocabulary to CKAN
             tag_object = tk.get_action("tag_create")(context, {"name": tag, "vocabulary_id": vocabulary["id"]})
+        # else grab a tag object if it already exists in a vocabulary
+        else:
+            tag_object = [t for t in vocabulary["tags"] if t["name"] == tag][0]
 
-            # add tag to package
-            # TODO - find package_id and add package to it
+        # add package tags (which have no dictionary associated w them) to attribute tags (from this newly changed datastore resource and all others in the package)
+        package_tags.append( tag_object )
 
-    
-
-#    for tag in tags:
-#        vocabulary_list = tk.get_action("vocabulary_list")(context)
-#        for vocabulary in vocabulary_list:
-#            if vocabulary["name"] == "attribute_tags":
-#                vocabulary_id = vocabulary["id"]
-        
-        
-
-    
-
-    # TODO
-    # add the tags gathered from above to a package_patch call, and add them to the `tags` object therein
-
-    # run original datastore_create
-    return original_datastore_create(context, data_dict)
+    tk.get_action("package_patch")(context, {"id": package["name"], "tags": package_tags })
