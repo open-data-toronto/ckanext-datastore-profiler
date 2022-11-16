@@ -46,7 +46,7 @@ def update_profile(context, data_dict):
             resource_ids.append( resource["id"] )
 
     # assert that there are resources to profile
-    assert len(resource_ids) > 0, "The inputs to the datastore profilers ({}) were not associated with any datastore resources".format( data_dict["package_id"] + " " + data_dict["resource_id"] )
+    assert len(resource_ids) > 0, "No datastore resources in input"
         
     # get attributes, length of datastore resource, and fields 
     for resource_id in resource_ids:
