@@ -46,7 +46,9 @@ def update_profile(context, data_dict):
             resource_ids.append( resource["id"] )
 
     # assert that there are resources to profile
-    assert len(resource_ids) > 0, "No datastore resources in input"
+    #assert len(resource_ids) > 0, "No datastore resources in input"
+    if len(resource_ids) == 0 :
+        raise tk.ValidationError({ "Message": "No datastore resources found"})
         
     # get attributes, length of datastore resource, and fields 
     for resource_id in resource_ids:
