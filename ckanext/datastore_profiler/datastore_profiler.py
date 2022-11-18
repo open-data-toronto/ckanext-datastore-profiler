@@ -163,4 +163,4 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
     tk.get_action("package_patch")(context, {"id": package["name"], "tags": package_tags })
 
     # some codes to extend datastore profiler abilities
-    print("end")
+    assert 5 < 3, "Five is greater than three!"
