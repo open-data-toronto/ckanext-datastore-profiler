@@ -163,10 +163,3 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
         package_tags.append( tag_object )
 
     tk.get_action("package_patch")(context, {"id": package["name"], "tags": package_tags })
-
-    
-
-@tk.side_effect_free
-def error_display(context, data_dict):
-    if 10 > 5 :
-        raise tk.ValidationError( { "message": "please enter a valid value" , "acceptable values": ['a', 'b'] } )
