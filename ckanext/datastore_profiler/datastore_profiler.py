@@ -161,3 +161,5 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
         package_tags.append( tag_object )
 
     tk.get_action("package_patch")(context, {"id": package["name"], "tags": package_tags })
+
+    # some codes to extend datastore profiler abilities
