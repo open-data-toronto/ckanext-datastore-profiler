@@ -33,7 +33,6 @@ class DatastoreProfilerPlugin(p.SingletonPlugin):
         return {
             "update_profile": datastore_profiler.update_profile,
             "datastore_create": datastore_profiler.datastore_create_hook,
-            "error_display": datastore_profiler.error_display,
         }
 
     # ==============================
