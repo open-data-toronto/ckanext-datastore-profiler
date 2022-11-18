@@ -46,7 +46,9 @@ def update_profile(context, data_dict):
             resource_ids.append( resource["id"] )
 
     # assert that there are resources to profile
-    assert len(resource_ids) > 0, "No datastore resources in input"
+    #assert len(resource_ids) > 0, "No datastore resources in input"
+    if len(resource_ids) == 0 :
+        raise tk.ValidationError({ "Message": "No datastore resources found"})
         
     # get attributes, length of datastore resource, and fields 
     for resource_id in resource_ids:
@@ -162,5 +164,9 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
 
     tk.get_action("package_patch")(context, {"id": package["name"], "tags": package_tags })
 
-    # some codes to extend datastore profiler abilities
-    assert 5 < 3, "Five is greater than three!"
+    
+
+@tk.side_effect_free
+def error_display(context, data_dict):
+    if 10 > 5 :
+        raise tk.ValidationError( { "message": "please enter a valid value" , "acceptable values": ['a', 'b'] } )
