@@ -24,7 +24,8 @@ import ckan.plugins.toolkit as tk
 def update_profile(context, data_dict):
 
     # make sure an authorized user is making this call
-    assert context["auth_user_obj"], "This endpoint can be used by authorized accounts only"
+    if context["auth_user_obj"] == False:
+        raise tk.ValidationError({"Authentication Error" : "This endpoint can be used by authorized accounts only"})
 
     ### GET DATASTORE RESOURCE ATTRIBUTES FROM CKAN
 
@@ -45,8 +46,7 @@ def update_profile(context, data_dict):
         if resource["datastore_active"] in [True, "True"]:
             resource_ids.append( resource["id"] )
 
-    # assert that there are resources to profile
-    #assert len(resource_ids) > 0, "No datastore resources in input"
+    # check there are resources to profile
     if len(resource_ids) == 0 :
         raise tk.ValidationError({ "Message": "No datastore resources found"})
         
@@ -115,7 +115,8 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
     # make sure an authorized user is making this call
     print("------------ Checking Auth")
     tk.check_access("datastore_create", context, data_dict)
-    assert context["auth_user_obj"], "This endpoint can be used by authorized accounts only"
+    if context["auth_user_obj"] == False:
+        raise tk.ValidationError({"Authentication Error" : "This endpoint can be used by authorized accounts only"})
     print("------------ Done Checking Auth")
 
     # run original datastore_create - we'll need its output to get package information
