@@ -26,6 +26,9 @@ def update_profile(context, data_dict):
     # make sure an authorized user is making this call
     assert context["auth_user_obj"], "This endpoint can be used by authorized accounts only"
 
+    if context["auth_user_obj"] == False:
+        raise tk.ValidationError({"Authentication Error" : "This endpoint can be used by authorized accounts only"})
+
     ### GET DATASTORE RESOURCE ATTRIBUTES FROM CKAN
 
     # init dict of resources to profile
@@ -116,6 +119,10 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
     print("------------ Checking Auth")
     tk.check_access("datastore_create", context, data_dict)
     assert context["auth_user_obj"], "This endpoint can be used by authorized accounts only"
+
+    if context["auth_user_obj"] == False:
+        raise tk.ValidationError({"Authentication Error" : "This endpoint can be used by authorized accounts only"})
+
     print("------------ Done Checking Auth")
 
     # run original datastore_create - we'll need its output to get package information
