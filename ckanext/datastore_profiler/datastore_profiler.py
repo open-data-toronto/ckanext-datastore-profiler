@@ -134,7 +134,7 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
     # Flatten the nested list to a single list
     sperated_tags = [item for sublist in nested_list for item in sublist]
 
-    print('=================================TAGS======================================')
+    print('=================================TAGS=======================================')
     print(tags)
     print('=================================NESTED LIST OF TAGS======================================')
     print(nested_list)
