@@ -131,7 +131,6 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
             tags.append(field["info"]["tags"])
             nested_list.append(field["info"]["tags"].split(' '))
             field["info"]["tags_separated"] = field["info"]["tags"].split(' ')
-            print(field["info"]["tags_separated"])
 
     # Flatten the nested list to a single list
     sperated_tags = [item for sublist in nested_list for item in sublist]
@@ -173,3 +172,7 @@ def datastore_create_hook(original_datastore_create, context, data_dict):
         package_tags.append( tag_object )
     
     tk.get_action("package_patch")(context, {"id": package["name"], "tags": package_tags })
+
+    #overwrite the original (user inputted) data_dict with the modified data_dict which contains a new key "tags_separated" for each field
+    original_datastore_create(context, data_dict)
+    print('================================ END ============================')
