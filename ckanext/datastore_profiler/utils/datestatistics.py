@@ -27,12 +27,24 @@ class DateStatistics:
             "%d-%b-%Y": "%Y-%m-%d",
             "%d-%b-%y": "%Y-%m-%d",
             "%b-%d-%Y": "%Y-%m-%d",
+            "%b-%d-%y": "%Y-%m-%d", #new
             "%m-%d-%y": "%Y-%m-%d",
             "%m-%d-%Y": "%Y-%m-%d",
             "%d-%m-%y": "%Y-%m-%d",
             "%Y%m%d%H%M%S": "%Y-%m-%dT%H:%M:%S.%f",
             "%d%m%Y": "%Y-%m-%d",
             "%d%b%Y": "%Y-%m-%d",
+            ##################### Less common formats ###############
+            "%d-%B-%Y": "%Y-%m-%d",
+            "%d-%B-%y": "%Y-%m-%d",
+            "%d%b%y": "%Y-%m-%d",
+            "%d%B%y": "%Y-%m-%d",
+            "%d%B%Y": "%Y-%m-%d",
+            "%B-%d-%Y": "%Y-%m-%d",
+            "%B-%d-%y": "%Y-%m-%d",
+            "%y-%m-%d": "%Y-%m-%d",
+            "%y-%b-%d": "%Y-%m-%d",
+            "%y-%B-%d": "%Y-%m-%d",
         }
 
         for format in format_dict.keys():
