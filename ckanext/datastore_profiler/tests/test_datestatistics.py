@@ -1,6 +1,7 @@
 # User defined modules
 from utils.datestatistics import DateStatistics
 from datetime import datetime
+import pytest
 
 test_dates = ["2020-06-12", "2020-06-12", "2001-06-12", "2020-06-21", "2020-06-26", "2020-06-26", "1987-11-12", "2020-11-12", "2020-11-12", "2020-11-12", "2020-12-12", None, None]
 test_timestamps = ["2020-06-12T07:30:00", "2020-06-12T07:30:00", "2001-06-12T16:30:00", "2020-06-21T16:30:00", "2020-06-26T16:30:00", "2020-06-26T07:30:00", "1987-11-12T07:15:00", "2020-11-12T07:15:00", "2020-11-12T07:15:00", "2020-11-12T07:30:22", "2020-12-12T07:30:22", None, None]
@@ -17,6 +18,12 @@ correct_hour_count = {'07': 8, '16': 3}
 correct_weekday_count = {'Friday': 4, 'Saturday': 1, 'Sunday': 1, 'Thursday': 4, 'Tuesday': 1}
 
 # TO DO: write test cases for each of the above outputs
+
+input_mix = ["2020-06-12 07:30:00", "2020-01-01"]
+
+def test_date_format_error():
+    with pytest.raises(TypeError):
+        DateStatistics().date_or_timestamp(input = input_mix)
 
 def test_date_min():
     """

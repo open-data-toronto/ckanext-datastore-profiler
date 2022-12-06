@@ -64,6 +64,8 @@ class DateStatistics:
             except ValueError as e:
                 pass
         
+        if not results:  #if the results list is empty
+	        raise TypeError("Unsupported/Inconsistant input format") 
 
         
         if all( [result == "%Y-%m-%d" for result in results] ):
@@ -72,6 +74,7 @@ class DateStatistics:
         elif all( [result == "%Y-%m-%dT%H:%M:%S.%f" for result in results] ):
             return {"data_type": "timestamp" , "data": outputs}
 
+        #The following statement will never get hit => should be removed?
         else:
             raise ValueError("Inputs to DateStatistics isn't all dates and isn't all datetimes/timestamps")
 
@@ -90,6 +93,7 @@ class DateStatistics:
         # scan inputs to ensure theyre the right data type, and translate them accordingly
         scanned_input = self.date_or_timestamp(input)
 
+        #The following statement will never get hit => should be removed?
         # make sure input contains only dates
         assert scanned_input["data_type"] in ["date", "timestamp"], "Inputs to date_count isn't all strings representing dates and isn't all strings representing datetimes/timestamps"
 
