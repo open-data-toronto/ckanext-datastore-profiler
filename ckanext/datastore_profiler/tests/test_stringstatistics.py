@@ -31,6 +31,28 @@ test_data = [
     None,
 ]
 
+test_unique_str = [
+    'a',
+    'b',
+    'c',
+]
+
+test_numeric = [
+    '1a1',
+    '22',
+    '333',
+]
+
+
+def test_all_unique():
+    dict_stats = StringStatistics().unique_count(test_unique_str)["all_unique"]
+    assert dict_stats is True
+
+
+def test_all_numeric():
+    dict_stats = StringStatistics().unique_count(test_numeric)["all_numeric"]
+    assert dict_stats is True
+
 
 def test_unique_string_counts():
     """
