@@ -7,10 +7,10 @@ Test following methods under StringStatistics class:
 - word_count
 
 Contain following functions:
-- test_unique_string_counts_from_list
-- test_unique_mask_counts_from_list
-- test_unique_word_counts_from_list
-- test_word_stats_from_list
+- test_unique_string_counts
+- test_unique_mask_counts
+- test_unique_word_counts
+- test_word_stats
 """
 
 # User defined modules
@@ -32,7 +32,7 @@ test_data = [
 ]
 
 
-def test_unique_string_counts_from_list():
+def test_unique_string_counts():
     """
     Test unique strings count
     """
@@ -59,7 +59,7 @@ def test_unique_string_counts_from_list():
     assert dict_stats == correct_stats
 
 
-def test_unique_mask_counts_from_list():
+def test_unique_mask_counts():
     """
     Test unique string mask/formatting count
     """
@@ -81,7 +81,7 @@ def test_unique_mask_counts_from_list():
     assert dict_stats == correct_stats
 
 
-def test_unique_word_counts_from_list():
+def test_unique_word_counts():
     """
     Test unique words count excluding stop words
     """
@@ -106,7 +106,7 @@ def test_unique_word_counts_from_list():
     assert dict_stats == correct_stats
 
 
-def test_word_stats_from_list():
+def test_word_stats():
     """
     Test min and max count and min and max of the strings length
     """
