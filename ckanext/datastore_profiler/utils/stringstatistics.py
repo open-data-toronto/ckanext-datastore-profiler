@@ -31,7 +31,7 @@ class StringStatistics:
 
         # if all strings are numeric, label the data as such
         all_numeric = False
-        if all([re.match(r"-?\d+\.?\d?", str(key)) for key in output.keys()]):
+        if all([item.isdigit() for item in input if item]):
             all_numeric = True
 
         # add number of empty values to output
