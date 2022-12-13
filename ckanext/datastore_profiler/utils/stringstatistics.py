@@ -21,6 +21,7 @@ class StringStatistics:
             and the number of times it appears as the value
         """
 
+        
         # count how many times each string appears in input
         output = Counter(input)
 
@@ -38,10 +39,13 @@ class StringStatistics:
         if None in input:
             output["Value Empty/Null"] = len(input) - len([x for x in input if x])
 
+        # Calc lenght of strings
+        input_lengths = [len(item) for item in input if item]
+
         # return output
         return {
-            "min_string_length": min([len(str(string)) for string in output]),
-            "max_string_length": max([len(str(string)) for string in output]),
+            "min_string_length": min(input_lengths),
+            "max_string_length": max(input_lengths),
             "counts": {
                 k: v
                 for k, v in sorted(
