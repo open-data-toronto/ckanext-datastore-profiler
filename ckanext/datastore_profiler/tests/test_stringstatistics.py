@@ -7,6 +7,11 @@ Test following methods under StringStatistics class:
 - word_count
 
 Contain following functions:
+- test_null_input_error
+- test_string_lenght_min
+- test_string_lenght_max
+- test_all_unique
+- test_all_numeric
 - test_unique_string_counts
 - test_unique_mask_counts
 - test_unique_word_counts
@@ -15,6 +20,7 @@ Contain following functions:
 
 # User defined modules
 from utils.stringstatistics import StringStatistics
+import pytest
 
 test_data = [
     "val2",
@@ -31,27 +37,94 @@ test_data = [
     None,
 ]
 
-test_unique_str = [
-    'a',
-    'b',
-    'c',
-]
 
-test_numeric = [
-    '1a1',
-    '22',
-    '333',
-]
+def test_null_input_error():
+    """
+    Test whether ValueError will be raised in case of empty or only None
+    input into StringStatistics().unique_count method.
+    """
+
+    test_null_input = [None, None, None]
+    test_empty_input = []
+
+    with pytest.raises(ValueError):
+        StringStatistics().unique_count(test_null_input)
+        StringStatistics().unique_count(test_empty_input)
+
+
+def test_string_lenght_min():
+    """
+    Test lenght of string with minimum lenght will be returned correctly
+    """
+
+    # get stats from appropriate class
+    dict_stats = StringStatistics().unique_count(test_data)["min_string_length"]
+
+    # set the expected results
+    correct_stats = 3
+
+    # assert response
+    assert dict_stats == correct_stats
+
+
+def test_string_lenght_max():
+    """
+    Test lenght of string with maximum lenght will be returned correctly
+    """
+
+    # get stats from appropriate class
+    dict_stats = StringStatistics().unique_count(test_data)["max_string_length"]
+
+    # set the expected results
+    correct_stats = 14
+
+    # assert response
+    assert dict_stats == correct_stats
 
 
 def test_all_unique():
+    """
+    Test all_unique returns a correct value if unique_count method
+    recieves a list of unique values.
+    """
+
+    test_unique_str = [
+        'a',
+        'b',
+        'c',
+    ]
     dict_stats = StringStatistics().unique_count(test_unique_str)["all_unique"]
     assert dict_stats is True
 
 
 def test_all_numeric():
+    """
+    Test all_numeric returns a correct value if unique_count method
+    recieves a list of strings containing only numbers.
+    """
+
+    test_numeric = [
+        '11',
+        '22',
+        '333',
+    ]
     dict_stats = StringStatistics().unique_count(test_numeric)["all_numeric"]
     assert dict_stats is True
+
+
+def test_null_count_in_unique_count_method():
+    """
+    Test null values count in unique_count method
+    """
+
+    # get stats from appropriate class
+    dict_stats = StringStatistics().unique_count(test_data)["null_count"]
+
+    # set the expected results
+    correct_stats = 2
+
+    # assert response
+    assert dict_stats == correct_stats
 
 
 def test_unique_string_counts():
