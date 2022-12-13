@@ -21,7 +21,9 @@ class StringStatistics:
             and the number of times it appears as the value
         """
 
-        
+        if not input or all(item is None for item in input):
+            raise ValueError ("The input is empty or only contains None values")
+
         # count how many times each string appears in input
         output = Counter(input)
 
