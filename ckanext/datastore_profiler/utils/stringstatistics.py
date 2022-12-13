@@ -1,4 +1,16 @@
-# stringstatistics.py - class(es) for summarizing lists of text/string data
+"""
+Summarize a list/column of text/string data
+
+This module contains the following class:
+- StringStatistics
+
+This module contains the following functions and methods:
+- unique_count
+- mask_count
+- word_count
+- geometry_stats
+- execute
+"""
 
 # Import python libraries
 import re
@@ -141,8 +153,11 @@ class StringStatistics:
 
         # return output sorted by count
         return {
+            # Return min No. of words in a given string
             "min_word_count": min([len(words.split(" ")) for words in working_data]),
+            # Return max No. of words in a given string
             "max_word_count": max([len(words.split(" ")) for words in working_data]),
+            # Count number of appearance of a word overall strings
             "word_counts": {
                 k: v
                 for k, v in sorted(

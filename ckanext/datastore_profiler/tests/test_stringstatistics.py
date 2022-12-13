@@ -213,8 +213,6 @@ def test_word_stats():
     correct_stats = {
         "min_word_count": 1,
         "max_word_count": 3,
-        "min_string_length": 3,
-        "max_string_length": 14,
     }
 
     # assert responses
