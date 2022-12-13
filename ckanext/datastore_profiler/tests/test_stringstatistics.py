@@ -8,8 +8,8 @@ Test following methods under StringStatistics class:
 
 Contain following functions:
 - test_null_input_error
-- test_string_lenght_min
-- test_string_lenght_max
+- test_string_length_min
+- test_string_length_max
 - test_all_unique
 - test_all_numeric
 - test_unique_string_counts
@@ -52,9 +52,9 @@ def test_null_input_error():
         StringStatistics().unique_count(test_empty_input)
 
 
-def test_string_lenght_min():
+def test_string_length_min():
     """
-    Test lenght of string with minimum lenght will be returned correctly
+    Test length of string with minimum length will be returned correctly
     """
 
     # get stats from appropriate class
@@ -67,9 +67,9 @@ def test_string_lenght_min():
     assert dict_stats == correct_stats
 
 
-def test_string_lenght_max():
+def test_string_length_max():
     """
-    Test lenght of string with maximum lenght will be returned correctly
+    Test length of string with maximum length will be returned correctly
     """
 
     # get stats from appropriate class
