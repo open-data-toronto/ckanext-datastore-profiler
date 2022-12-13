@@ -22,7 +22,7 @@ class StringStatistics:
         """
 
         if not input or all(item is None for item in input):
-            raise ValueError ("The input is empty or only contains None values")
+            raise ValueError("The input is empty or only contains None values")
 
         # count how many times each string appears in input
         output = Counter(input)
@@ -39,7 +39,7 @@ class StringStatistics:
 
         # add number of empty values to output
         if None in input:
-            output["Value Empty/Null"] = len(input) - len([x for x in input if x])
+            output["Value Empty/Null"] = len([x for x in input if x is None])
 
         # Calc lenght of strings
         input_lengths = [len(item) for item in input if item]
@@ -56,6 +56,7 @@ class StringStatistics:
             },
             "all_unique": all_unique,
             "all_numeric": all_numeric,
+            "null_count": output["Value Empty/Null"]
         }
 
     def mask_count(self, input):
@@ -73,7 +74,7 @@ class StringStatistics:
         output = {}
 
         # for each string, create masks by replacing letters with "L" and
-        # # digits with "D", then count each mask
+        # digits with "D", then count each mask
         masks = [
             re.sub("[0-9]", "D", re.sub("[a-zA-Z]", "L", str(x))) for x in input if x
         ]
@@ -81,7 +82,7 @@ class StringStatistics:
 
         # add number of empty values to output
         if None in input:
-            output["null_count"] = len(input) - len([x for x in input if x])
+            output["null_count"] = len([x for x in input if x is None])
 
         return {
             "counts": {
@@ -136,7 +137,7 @@ class StringStatistics:
 
         # add number of empty values to output
         if None in input:
-            output["Value Empty/Null"] = len(input) - len([x for x in input if x])
+            output["Value Empty/Null"] = len([x for x in input if x is None])
 
         # return output sorted by count
         return {
