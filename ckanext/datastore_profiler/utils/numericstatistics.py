@@ -1,16 +1,30 @@
-# numericstatistics.py - class for summarizing lists of numeric data
+"""
+Summarize a list/column of numbers
 
-# Import python libraries
-from dataclasses import dataclass
+This module contains the following class:
+- NumericStatistics
+
+This module contains the following functions and methods:
+- numeric_count
+"""
+
+# Standard libraries
 from collections import Counter
 import statistics
+
+# Related third party libraries
+
+# Local application specific libraries
+from dataclasses import dataclass
 
 
 @dataclass
 class NumericStatistics:
     """
-    This class is a Collection of methods that compute statistics (based on
-    input datatype) as required by OpenData
+    This class computes statistics on numbers.
+
+    Methods included:
+    - numeric_count
     """
 
     def numeric_count(self, input):
@@ -27,10 +41,10 @@ class NumericStatistics:
                             count of nulls)
         """
 
-        # make sure all inputs can be converted to float
+        # convert "None" stings to None object
         input = [None if item == "None" else item for item in input]
-        # number == number notation is to check for NaNs, since NaN does not
-        # equal itself
+
+        # Check the inputs are valid. Allowed inputs are float, int, NaN, and None
 
         try:
             all(isinstance(float(x), float) for x in input if x and x == x)
@@ -46,14 +60,14 @@ class NumericStatistics:
             return {"all_null": True}
 
         # calculate distinct counts that each number appears
-        number_counts = Counter(working_data)
+        number_counts = Counter(working_data) 
 
         # if all numbers are unique, label the data as such
         all_unique = False
         if all([value == 1 for value in number_counts.values()]):
             all_unique = True
 
-        # make sure this isnt all nulls and NaN
+        # make sure this is not all nulls and NaN
         null_count = len([item for item in input if item in [None, ""] or item != item])
         if null_count == len(input):
             return {"all_null": True}
@@ -65,4 +79,5 @@ class NumericStatistics:
             "mean": statistics.mean(working_data),
             "null_count": null_count,
             "all_unique": all_unique,
+            "total_values_count": len(working_data)
         }
