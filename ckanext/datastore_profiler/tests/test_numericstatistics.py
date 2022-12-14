@@ -101,17 +101,3 @@ def test_number_of_null_values():
 
     # Assert response
     assert dict_stats.get("null_count") == 2
-
-
-# def test_counts_of_values():
-#    """
-#        Testcase to check count of values in the list
-#    """
-#    # Compute stats from profiler
-#    dict_stats = NumericStatistics().numeric_count(test_data)
-#
-#    # Expected output
-#    dict_expected = {'1': 1, '2': 1, '3': 1, '4': 1, '5': 4, '5.5': 1, '-5': 1, '1213': 1, '12.1231231231': 1, '9': 1}
-#
-#    # Assert response
-#    assert dict_stats.get('number_counts') == dict_expected
