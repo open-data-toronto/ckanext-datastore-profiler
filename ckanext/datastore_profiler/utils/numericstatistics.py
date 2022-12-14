@@ -44,12 +44,12 @@ class NumericStatistics:
         # convert "None" stings to None object
         input = [None if item == "None" else item for item in input]
 
-        # Check the inputs are valid. Allowed inputs are float, int, NaN, and None
-
-        try:
-            all(isinstance(float(x), float) for x in input if x and x == x)
-        except ValueError:
-            print("Input to numeric profiler must be all int, float, NaN, or null")
+        # Check the inputs are valid.
+        # Only float, int, NaN, and None are allowed
+        if not all(isinstance(float(x), float) for x in input if x and x == x):
+            raise ValueError(
+                "Input to numeric profiler must be int, float, NaN, or null"
+            )
 
         # remove null and NaN from input
         working_data = [
@@ -60,7 +60,7 @@ class NumericStatistics:
             return {"all_null": True}
 
         # calculate distinct counts that each number appears
-        number_counts = Counter(working_data) 
+        number_counts = Counter(working_data)
 
         # if all numbers are unique, label the data as such
         all_unique = False
@@ -68,7 +68,7 @@ class NumericStatistics:
             all_unique = True
 
         # make sure this is not all nulls and NaN
-        null_count = len([item for item in input if item in [None, ""] or item != item])
+        null_count = len([x for x in input if x in [None, ""] or x != x])
         if null_count == len(input):
             return {"all_null": True}
 
@@ -79,5 +79,5 @@ class NumericStatistics:
             "mean": statistics.mean(working_data),
             "null_count": null_count,
             "all_unique": all_unique,
-            "total_values_count": len(working_data)
+            "total_values_count": len(working_data),
         }
