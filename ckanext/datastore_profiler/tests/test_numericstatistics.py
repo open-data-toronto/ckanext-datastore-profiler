@@ -1,66 +1,98 @@
 # User defined modules
 from utils.numericstatistics import NumericStatistics
+import pytest
 
-test_data = [1,2,3,4,5,5.5, 5,5,5, -5, 1213, 12.1231231231, 9, None]
-    
-def test_min_value_from_list():
-    """
-        Testcase to check computation of min value from a list
-    """
-    # Compute stats from profiler
-    dict_stats = NumericStatistics().numeric_count(test_data)
+test_data = [
+    1,
+    2,
+    3,
+    4,
+    5,
+    5.5,
+    5,
+    5,
+    5,
+    -5,
+    1213,
+    12.1231231231,
+    9,
+    None,
+    float("NaN"),
+]
 
-    # Assert response
-    assert dict_stats.get('min') == -5
 
-def test_max_value_from_list():
+def test_invalid_input_error():
     """
-        Testcase to check computation of max value from a list
+    Test raising ValueError when input is invalid (e.g. a string)
     """
-    # Compute stats from profiler
-    dict_stats = NumericStatistics().numeric_count(test_data)
+    invalid_data = [1, "a"]
+    with pytest.raises(ValueError):
+        NumericStatistics().numeric_count(invalid_data)
 
-    # Assert response
-    assert dict_stats.get('max') == 1213
 
-def test_mean_value_from_list():
+def test_min_value():
     """
-        Testcase to check computation of mean value from a list
-    """
-    # Compute stats from profiler
-    dict_stats = NumericStatistics().numeric_count(test_data)
-
-    # Assert response
-    assert dict_stats.get('mean') == 97.2787017787
-
-def test_median_value_from_list():
-    """
-        Testcase to check computation of median value from a list
+    Testcase to check computation of min value from a list
     """
     # Compute stats from profiler
     dict_stats = NumericStatistics().numeric_count(test_data)
 
     # Assert response
-    assert dict_stats.get('median') == 5
+    assert dict_stats.get("min") == -5
 
-def test_number_of_null_values_in_list():
+
+def test_max_value():
     """
-        Testcase to check no. of Null Values in the list
+    Testcase to check computation of max value from a list
     """
     # Compute stats from profiler
     dict_stats = NumericStatistics().numeric_count(test_data)
 
     # Assert response
-    assert dict_stats.get('null_count') == 1
+    assert dict_stats.get("max") == 1213
 
-#def test_counts_of_values_in_list():
+
+def test_mean_value():
+    """
+    Testcase to check computation of mean value from a list
+    """
+    # Compute stats from profiler
+    dict_stats = NumericStatistics().numeric_count(test_data)
+
+    # Assert response
+    assert dict_stats.get("mean") == 97.2787017787
+
+
+def test_median_value():
+    """
+    Testcase to check computation of median value from a list
+    """
+    # Compute stats from profiler
+    dict_stats = NumericStatistics().numeric_count(test_data)
+
+    # Assert response
+    assert dict_stats.get("median") == 5
+
+
+def test_number_of_null_values():
+    """
+    Testcase to check no. of Null Values in the list
+    """
+    # Compute stats from profiler
+    dict_stats = NumericStatistics().numeric_count(test_data)
+
+    # Assert response
+    assert dict_stats.get("null_count") == 2
+
+
+# def test_counts_of_values():
 #    """
 #        Testcase to check count of values in the list
 #    """
 #    # Compute stats from profiler
 #    dict_stats = NumericStatistics().numeric_count(test_data)
 #
-#    # Expected output  
+#    # Expected output
 #    dict_expected = {'1': 1, '2': 1, '3': 1, '4': 1, '5': 4, '5.5': 1, '-5': 1, '1213': 1, '12.1231231231': 1, '9': 1}
 #
 #    # Assert response
