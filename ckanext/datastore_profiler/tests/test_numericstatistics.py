@@ -1,6 +1,24 @@
-# User defined modules
-from utils.numericstatistics import NumericStatistics
+"""
+Test module for numericstatistics module using pytest
+
+Test numeric_count method under NumericStatistics class.
+The module contains the following functions:
+- test_invalid_input_error
+- test_min_value
+- test_max_value
+- test_mean_value
+- test_median_value
+- test_number_of_null_values
+"""
+
+# Standard libraries
+
+# Related third party libraries
 import pytest
+
+# Local application specific libraries
+from utils.numericstatistics import NumericStatistics
+
 
 test_data = [
     1,
