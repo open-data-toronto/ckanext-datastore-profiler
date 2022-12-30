@@ -197,7 +197,6 @@ def test_unique_word_counts(word_count_output):
         "val-3": 2,
         "val3": 2,
         "val1": 2,
-        "is": 2,
         "Value Empty/Null": 2,
         "ccc-9": 1,
         "d-1": 1,
