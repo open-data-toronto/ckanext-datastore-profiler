@@ -18,26 +18,47 @@ Contain following functions:
 - test_word_stats
 """
 
-# User defined modules
-from utils.stringstatistics import StringStatistics
+# Standard libraries
+
+# Related third party libraries
 import pytest
 
-test_data = [
-    "val2",
-    "val3",
-    "val4",
-    "ccc-9",
-    "d-1",
-    "val-3",
-    "val-3",
-    "val1 val2 val3",
-    "this is val1",
-    "this is val2",
-    None,
-    None,
-]
+# Local application specific libraries
+from utils.stringstatistics import StringStatistics
 
 
+# Define fixtures
+@pytest.fixture
+def test_data():
+    return [
+        "val2",
+        "val3",
+        "val4",
+        "ccc-9",
+        "d-1",
+        "val-3",
+        "val-3",
+        "val1 val2 val3",
+        "this is val1",
+        "this is val2",
+        None,
+        None,
+        ]
+
+@pytest.fixture
+def unique_count_output(test_data):
+    return StringStatistics().unique_count(test_data)
+
+@pytest.fixture
+def mask_count_output(test_data):
+    return StringStatistics().mask_count(test_data)
+
+@pytest.fixture
+def word_count_output(test_data):
+    return StringStatistics().word_count(test_data)
+
+
+# Define test functions
 def test_null_input_error():
     """
     Test whether ValueError will be raised in case of empty or only None
@@ -52,34 +73,28 @@ def test_null_input_error():
         StringStatistics().unique_count(test_empty_input)
 
 
-def test_string_length_min():
+def test_string_length_min(unique_count_output):
     """
     Test length of string with minimum length will be returned correctly
     """
-
-    # get stats from appropriate class
-    dict_stats = StringStatistics().unique_count(test_data)["min_string_length"]
 
     # set the expected results
     correct_stats = 3
 
     # assert response
-    assert dict_stats == correct_stats
+    assert unique_count_output["min_string_length"] == correct_stats
 
 
-def test_string_length_max():
+def test_string_length_max(unique_count_output):
     """
     Test length of string with maximum length will be returned correctly
     """
-
-    # get stats from appropriate class
-    dict_stats = StringStatistics().unique_count(test_data)["max_string_length"]
 
     # set the expected results
     correct_stats = 14
 
     # assert response
-    assert dict_stats == correct_stats
+    assert unique_count_output["max_string_length"] == correct_stats
 
 
 def test_all_unique():
@@ -94,6 +109,8 @@ def test_all_unique():
         'c',
     ]
     dict_stats = StringStatistics().unique_count(test_unique_str)["all_unique"]
+
+    # assert response
     assert dict_stats is True
 
 
@@ -109,31 +126,27 @@ def test_all_numeric():
         '333',
     ]
     dict_stats = StringStatistics().unique_count(test_numeric)["all_numeric"]
+
+    # assert response
     assert dict_stats is True
 
 
-def test_null_count_in_unique_count_method():
+def test_null_count_in_unique_count_method(unique_count_output):
     """
     Test null values count in unique_count method
     """
-
-    # get stats from appropriate class
-    dict_stats = StringStatistics().unique_count(test_data)["null_count"]
 
     # set the expected results
     correct_stats = 2
 
     # assert response
-    assert dict_stats == correct_stats
+    assert unique_count_output["null_count"] == correct_stats
 
 
-def test_unique_string_counts():
+def test_unique_string_counts(unique_count_output):
     """
     Test unique strings count
     """
-
-    # get stats from appropriate class
-    dict_stats = StringStatistics().unique_count(test_data)["counts"]
 
     # set the expected results
     correct_stats = {
@@ -151,16 +164,13 @@ def test_unique_string_counts():
     }
 
     # assert response
-    assert dict_stats == correct_stats
+    assert unique_count_output["counts"] == correct_stats
 
 
-def test_unique_mask_counts():
+def test_unique_mask_counts(mask_count_output):
     """
     Test unique string mask/formatting count
     """
-
-    # get stats from appropriate class
-    dict_stats = StringStatistics().mask_count(test_data)["counts"]
 
     # set the expected results
     correct_stats = {
@@ -173,16 +183,13 @@ def test_unique_mask_counts():
     }
 
     # assert response
-    assert dict_stats == correct_stats
+    assert mask_count_output["counts"] == correct_stats
 
 
-def test_unique_word_counts():
+def test_unique_word_counts(word_count_output):
     """
     Test unique words count excluding stop words
     """
-
-    # get stats from appropriate class
-    dict_stats = StringStatistics().word_count(test_data)["word_counts"]
 
     # set the expected results
     correct_stats = {
@@ -190,7 +197,6 @@ def test_unique_word_counts():
         "val-3": 2,
         "val3": 2,
         "val1": 2,
-        "is": 2,
         "Value Empty/Null": 2,
         "ccc-9": 1,
         "d-1": 1,
@@ -198,16 +204,13 @@ def test_unique_word_counts():
     }
 
     # assert response
-    assert dict_stats == correct_stats
+    assert word_count_output["word_counts"] == correct_stats
 
 
-def test_word_stats():
+def test_word_stats(word_count_output):
     """
     Test min and max count and min and max of the strings length
     """
-
-    # get stats from appropriate class
-    dict_stats = StringStatistics().word_count(test_data)
 
     # set the expected results
     correct_stats = {
@@ -216,5 +219,5 @@ def test_word_stats():
     }
 
     # assert responses
-    assert dict_stats["min_word_count"] == correct_stats["min_word_count"]
-    assert dict_stats["max_word_count"] == correct_stats["max_word_count"]
+    assert word_count_output["min_word_count"] == correct_stats["min_word_count"]
+    assert word_count_output["max_word_count"] == correct_stats["max_word_count"]
