@@ -1,4 +1,5 @@
 """
+Author: Reza.Ghasemzadeh@toronto.ca
 Test module for stringsatistics module using pytest
 
 Test following methods under StringStatistics class:
