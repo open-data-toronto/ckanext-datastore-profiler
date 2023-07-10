@@ -11,7 +11,7 @@ The module contains the following functions:
 - test_year_count
 - test_weekday_count
 - test_hour_count
-TEST M2
+TEST M3
 """
 
 import pytest
